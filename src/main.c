@@ -83,6 +83,8 @@ int main(int argc, char** argv) {
 
 	mount_specialfs();
 
+	remount_root_rw(init_arguments.rootdrv, init_arguments.rootfstype, MS_REMOUNT | MS_NOATIME);
+
 	ok("Finished mounting");
 
 	startup_scripts();

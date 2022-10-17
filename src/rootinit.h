@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "util.h"
 
-void mount_drive();
+void remount_root_rw(char* rootfs, char* rootfs_type, unsigned long rootfs_mount_flags);
+void mount_drive(char* drv, char* fstype, char* destdir, unsigned long flags);
 void startup_scripts();
 void launch_daemons(); 
