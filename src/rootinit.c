@@ -34,14 +34,34 @@ inline void startup_scripts() {
 		perror("execve");
 	} else {
 		waitpid(pid,0,0);
-		ok("Exited debug shell");
+		ok("Done with startup scripts");
 	}
 
 	return;
 }
 
+
 inline void launch_daemons() {
 	printf("Launch programs...\n");
+
+	
+
+	// In a directory there should be either:
+	//  - symlinks to programs
+	//  - shell scripts that launch programs
+	// that can be directly executed
+
+	/*
+	pid_t pid=fork();
+
+	if (pid==0) {
+		execve();
+		perror("execve");
+	} else {
+		waitpid(pid,0,0);
+		ok("Done launching programs");
+	}
+	*/
 
 	return;
 }

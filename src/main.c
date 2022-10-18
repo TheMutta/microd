@@ -65,15 +65,6 @@ int main(int argc, char** argv) {
 		
 		mount_root(init_arguments.rootdrv, init_arguments.rootfstype, MS_RDONLY | MS_NOATIME);
 		switch_root();
-/*
-		// Say goodbye
-		static char* new_args[] = {"init", "in_root", NULL};
-		static char* new_env[] = {"PATH=/bin:/sbin", NULL};
-
-		execve("/init", new_args, new_env);
-		perror("excle");
-
-		panic("Failed to execute /init on new root. Cannot proceed.");*/
 	}
 	
 	ok("Started root /init");
