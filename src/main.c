@@ -89,6 +89,8 @@ int main(int argc, char** argv) {
 	while (true) {
 		debug_shell();
 	}
+
+	ok("System is booted!!!");
 }
 
 void sig_handler(int signum){

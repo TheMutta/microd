@@ -2,6 +2,7 @@
 #include <sys/mount.h>
 #include <sys/syscall.h>
 #include <unistd.h>
+#include "tinydir.h"
 #include "util.h"
 
 void remount_root_rw(char* rootfs, char* rootfs_type, unsigned long rootfs_mount_flags);

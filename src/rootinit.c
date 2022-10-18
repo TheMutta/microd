@@ -42,26 +42,34 @@ inline void startup_scripts() {
 
 
 inline void launch_daemons() {
-	printf("Launch programs...\n");
+	printf("Launching daemons...\n");
 
-	
+	tinydir_dir dir;
+	tinydir_open(&dir, "/etc/autostart");
 
-	// In a directory there should be either:
-	//  - symlinks to programs
-	//  - shell scripts that launch programs
-	// that can be directly executed
+	while (dir.has_next) {
+		tinydir_file file;
+		tinydir_readfile(&dir, &file);
 
-	/*
-	pid_t pid=fork();
+		if (!file.is_dir) {
+			char* file_name = malloc(256);
+			strcat(file_name, "/etc/autostart/");
+			strcat(file_name, file.name);
+			char* args[]= {file.name, NULL};
+			printf("Executing %s...\n", file_name);
 
-	if (pid==0) {
-		execve();
-		perror("execve");
-	} else {
-		waitpid(pid,0,0);
-		ok("Done launching programs");
+			pid_t pid = fork();
+			
+			if (pid == 0) {
+				execv(file_name, args);
+				perror("execv");
+			}
+		}
+
+		tinydir_next(&dir);
 	}
-	*/
+
+	tinydir_close(&dir);	
 
 	return;
 }
