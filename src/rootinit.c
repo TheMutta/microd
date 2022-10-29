@@ -41,8 +41,8 @@ inline void startup_scripts() {
 }
 
 
-inline void launch_daemons() {
-	printf("Launching daemons...\n");
+inline void launch_programs() {
+	printf("Launching programs...\n");
 
 	tinydir_dir dir;
 	tinydir_open(&dir, "/etc/autostart");

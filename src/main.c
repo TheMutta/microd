@@ -83,9 +83,9 @@ int main(int argc, char** argv) {
 
 	ok("Finished running startups scripts");
 	
-	launch_daemons();
+	launch_programs();
 
-	ok("Finished launching daemons");
+	ok("Finished launching programs");
 
 	ok("System is booted!!!");
 
