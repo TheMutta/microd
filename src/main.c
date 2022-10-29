@@ -9,7 +9,6 @@
 
 #include "rdinit.h"
 #include "rootinit.h"
-#include "postinit.h"
 #include "mount_special.h"
 #include "util.h"
 
@@ -86,13 +85,12 @@ int main(int argc, char** argv) {
 	launch_daemons();
 
 	ok("Finished launching daemons");
-	
-	ok("System is booted!!!");
-	launch_session_manager();
 
 	while (true) {
 		debug_shell();
 	}
+
+	ok("System is booted!!!");
 }
 
 void sig_handler(int signum){
