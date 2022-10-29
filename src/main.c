@@ -11,6 +11,7 @@
 #include "rootinit.h"
 #include "mount_special.h"
 #include "util.h"
+#include "postinit.h"
 
 const char* version = "0.0.0.1-alpha1-devel";
 
@@ -86,11 +87,15 @@ int main(int argc, char** argv) {
 
 	ok("Finished launching daemons");
 
-	while (true) {
-		debug_shell();
-	}
-
 	ok("System is booted!!!");
+
+	post_init();
+
+	panic("Something is wrong. We have passed the post_init() function.");
+
+	reboot();
+
+	// We should NEVER return.
 }
 
 void sig_handler(int signum){
