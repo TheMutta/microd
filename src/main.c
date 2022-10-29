@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
 
 	ok("System is booted!!!");
 
-	post_init();
+	post_init(init_arguments.is_debug);
 
 	panic("Something is wrong. We have passed the post_init() function.");
 
