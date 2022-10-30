@@ -56,13 +56,14 @@ inline void launch_programs() {
 			strcat(file_name, "/etc/autostart/");
 			strcat(file_name, file.name);
 			char* args[]= {file.name, NULL};
+			char* env[]={"PATH=/bin:/sbin", NULL};
 			printf("Executing %s...\n", file_name);
 
 			pid_t pid = fork();
 			
 			if (pid == 0) {
-				execv(file_name, args);
-				perror("execv");
+				execve(file_name, args, env);
+				perror("execve");
 			}
 		}
 

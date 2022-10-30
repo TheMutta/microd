@@ -27,5 +27,4 @@ run :
 	./mutta-init
 
 setup:
-	@mkdir $(SRCDIR)
 	@mkdir $(OBJDIR)
