@@ -34,7 +34,6 @@ inline void startup_scripts() {
 		perror("execve");
 	} else {
 		waitpid(pid,0,0);
-		ok("Done with startup scripts");
 	}
 
 	return;
