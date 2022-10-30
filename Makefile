@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -static
+CFLAGS = -static -Wall -O2
 LDFLAGS = -static
 
 SRCDIR := src
@@ -23,8 +23,10 @@ link:
 	@ echo !==== LINKING
 	$(CC) $(LDFLAGS) $(OBJS) -o mutta-init
 
-run :
-	./mutta-init
+clean:
+	@ echo !==== CLEANING
+	@ rm -rf $(OBJDIR)/*
 
 setup:
-	@mkdir $(OBJDIR)
+	@ echo !==== CREATING DIRECTORIES
+	@ mkdir $(OBJDIR)
