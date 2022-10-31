@@ -7,7 +7,7 @@ inline void ok(char* message) {
 inline void panic(char* message) {
 	printf("[\033[0;31mPANIC\033[0m] %s\n", message);
 	debug_shell();
-	kill(getpid(), SIGUSR1);
+	kill(1, SIGUSR1);
 }
 
 inline void warning(char* message) {
@@ -33,6 +33,7 @@ inline void debug_shell() {
 }
 
 inline void reboot() {
+	sync();
 	sync();
 	syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_RESTART, 0);
 }
