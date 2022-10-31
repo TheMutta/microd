@@ -1,4 +1,4 @@
-# Mutta-Init
+# Microd
 An init system for linux that aims to be a functional replacement for a SysVInit-style init, but in a more modern and more flexible way.  
 This is a personal project, don't use it in a production enviroment. Use it as a case study instead.
 ## How does it work?
