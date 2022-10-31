@@ -13,7 +13,7 @@
 #include "util.h"
 #include "postinit.h"
 
-const char* version = "0.0.0.1-alpha1-devel";
+const char* version = "0.1.0-alpha";
 
 struct arguments {
 	bool is_in_root;
