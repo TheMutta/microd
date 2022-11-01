@@ -1,3 +1,20 @@
+// Microd, a simple futiristic init system for Linux
+// Copyright (C) 2022-2022 Mutta Filippo
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License along
+// with this program; if not, write to the Free Software Foundation, Inc.,
+// 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 #include <unistd.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -13,7 +30,9 @@
 #include "util.h"
 #include "postinit.h"
 
-const char* version = "0.1.0-alpha";
+const char* version = "0.2.0-alpha-rc1";
+const char* author = "Mutta Filippo";
+const char* date = "2022-2022";
 
 struct arguments {
 	bool is_in_root;
@@ -123,7 +142,12 @@ inline void parse_arguments(int argc, char** argv) {
 inline void initrd_init() {
 	ok("Started initrd /init");
 	printf("Hello, world!\n"
-	       "Mutta-Init v%s\n", version);
+	       "Microd version %s, Copyright (C) %s %s\n"
+	       "Microd comes with ABSOLUTELY NO WARRANTY.\n"
+	       "This is free software, and you are welcome to redistribute it.\n"
+	       "under certain conditions. Please consult the LICENSE file,\n"
+	       "located in the program's repository, for more information.\n",
+	       version, date, author);
 
 	mount_specialfs();
 	ok("Finished mounting filesystems.");
@@ -140,7 +164,12 @@ inline void root_init() {
 	ok("Started root /init");
 	printf("Welcome to Linux!\n\a"
 	       "Hello, World!\n"
-	       "Mutta-Init v%s\n", version);
+	       "Microd version %s, Copyright (C) %s %s\n"
+	       "Microd comes with ABSOLUTELY NO WARRANTY.\n"
+	       "This is free software, and you are welcome to redistribute it.\n"
+	       "under certain conditions. Please consult the LICENSE file,\n"
+	       "located in the program's repository, for more information.\n",
+	       version, date, author);
 
 	mount_specialfs();
 
