@@ -7,7 +7,7 @@ inline void ok(char* message) {
 inline void panic(char* message) {
 	printf("[\033[0;31mPANIC\033[0m] %s\n", message);
 	debug_shell();
-	kill(1, SIGUSR1);
+	reboot();
 }
 
 inline void warning(char* message) {
@@ -26,6 +26,7 @@ inline void debug_shell() {
 		static char *env[]={"PATH=/bin:/sbin", NULL};
 		execve("/bin/busybox", argv, env);
 		perror("execve");
+		exit(1);
 	} else {
 		waitpid(pid,0,0);
 		ok("Exited debug shell");

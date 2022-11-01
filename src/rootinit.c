@@ -32,6 +32,7 @@ inline void startup_scripts() {
 		static char *env[]={"PATH=/bin:/sbin", NULL};
 		execve("/bin/busybox", argv, env);
 		perror("execve");
+		exit(1);
 	} else {
 		waitpid(pid,0,0);
 	}
@@ -43,6 +44,7 @@ inline void startup_scripts() {
 inline void launch_programs() {
 	printf("Launching programs...\n");
 
+
 	tinydir_dir dir;
 	tinydir_open(&dir, "/etc/autostart");
 
@@ -51,18 +53,122 @@ inline void launch_programs() {
 		tinydir_readfile(&dir, &file);
 
 		if (!file.is_dir) {
-			char* file_name = malloc(256);
+			char file_name[512] = {0};
 			strcat(file_name, "/etc/autostart/");
 			strcat(file_name, file.name);
-			char* args[]= {file.name, NULL};
-			char* env[]={"PATH=/bin:/sbin", NULL};
-			printf("Executing %s...\n", file_name);
+			if (strcmp(file.extension, "unit") == 0) {
+				// Executing it as an unit
+				printf("Executing unit %s...\n", file_name);
+				FILE *unit_file = fopen(file_name, "r");
+				char* buffer;
+				char* lines;
+				bool valid = false;
+				bool exec = false;
+				char* executable = malloc(2048);
+				char* executable_cmd = malloc(512);
+				char* arg;
+				bool message = false;
+				char* message_text = malloc(1024);
+				unsigned long file_size;
 
-			pid_t pid = fork();
-			
-			if (pid == 0) {
-				execve(file_name, args, env);
-				perror("execve");
+				if(unit_file) {
+					fseek(unit_file, 0 , SEEK_END);
+					file_size = ftell(unit_file);
+					fseek(unit_file, 0 , SEEK_SET);
+
+					buffer = malloc(file_size);
+					lines = malloc(file_size);
+
+					char ch;
+					int i = 0;
+					do {
+						ch = fgetc(unit_file);
+						buffer[i++] = ch;
+					} while (ch != EOF);
+					
+					i=0;
+					lines = strtok(buffer, "\n");
+					while (lines != NULL) {
+						if(strcmp(lines, "[Unit]") == 0) {
+							valid = true;
+						} else {
+							if (strcmp(lines, "[Exec]") == 0) {
+								lines = strtok(NULL,"\n");
+								exec = true;
+								executable = lines;
+							} else if (strcmp(lines, "[Message]") == 0) {
+								lines = strtok(NULL,"\n");
+								message = true;
+								message_text = lines;
+							} else if (strcmp(lines, "[Requires]") == 0) {
+								warning("[Requires] instruction not yet implemented");
+							} 
+						}
+						lines = strtok(NULL,"\n");
+					}
+
+					free(buffer);
+					free(lines);
+				}
+
+				fclose(unit_file);
+				
+				if (valid && message)
+					printf("%s", message_text);
+				fflush(stdout);
+				
+				if (valid && exec){
+					pid_t controller = fork();
+					if (controller == 0) {
+						while (true) {
+							pid_t daemon = fork();
+							if (daemon == 0) {
+								char* args[256];
+								int i = 1;
+								arg = strtok(executable, " ");
+								executable_cmd = arg;
+								args[0] = executable_cmd;
+								while (arg != NULL) {
+									arg = strtok(NULL, " ");
+									printf("%s", arg);
+									args[i] = arg;
+									i++;
+								}
+								execvp(executable_cmd, args);
+								perror("execvp");
+								exit(1);
+							} else {
+								waitpid(daemon,0,0);
+								// Revive it
+							}
+						}
+
+						exit(1);
+					}
+				} else {
+					printf("Unit not valid!\n");
+				}
+			} else if (strcmp(file.extension, "disabled") == 0) {
+				printf("Ignoring %s...\n", file_name);
+				// It's disabled, ignore it
+			} else if (strcmp(file.extension, "sh") == 0) {
+				// Executing it as a shell script
+				printf("Executing shell script %s...\n", file_name);
+				pid_t pid = fork();
+				if (pid == 0) {
+					execl(file_name, file.name, (char*)NULL);
+					perror("execl");
+					exit(1);
+				} 
+			} else {
+				// Executing it as a normal executable
+				printf("Executing file %s...\n", file_name);
+				pid_t pid = fork();
+				if (pid == 0) {
+					execl(file_name, file.name, (char*)NULL);
+					perror("execl");
+					exit(1);
+				}
 			}
 		}
 
@@ -70,6 +176,4 @@ inline void launch_programs() {
 	}
 
 	tinydir_close(&dir);	
-
-	return;
 }

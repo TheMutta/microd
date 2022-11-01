@@ -39,16 +39,11 @@ void initrd_init();
 void root_init();
 
 int main(int argc, char** argv) {
+
 	if (getpid() != 1) {
 		printf("Not running as PID 1.\n");
 		exit(0);
 	}
-
-	init_arguments.is_debug = false;
-	init_arguments.is_in_root = false;
-	init_arguments.rootdrv = "";
-	init_arguments.rootfstype = "";
-	boot_runlevel = OFF;
 
 	signal(SIGINT, sig_handler);
 	signal(SIGHUP, sig_handler);
@@ -59,6 +54,13 @@ int main(int argc, char** argv) {
 	signal(SIGFPE, sig_handler);
 	signal(SIGUSR1, sig_handler);
 	signal(SIGUSR2, sig_handler);
+
+
+	init_arguments.is_debug = false;
+	init_arguments.is_in_root = false;
+	init_arguments.rootdrv = "";
+	init_arguments.rootfstype = "";
+	boot_runlevel = OFF;
 
 	parse_arguments(argc, argv);
 		
@@ -157,7 +159,7 @@ inline void root_init() {
 	ok("System is booted!!!");
 }
 
-void sig_handler(int signum){
+void sig_handler(int signum) {
 	(void)signum;
 	reboot();
 }

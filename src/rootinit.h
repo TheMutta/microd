@@ -2,6 +2,8 @@
 #include <sys/mount.h>
 #include <sys/syscall.h>
 #include <unistd.h>
+#include <stdbool.h>
+
 #include "tinydir.h"
 #include "util.h"
 
