@@ -114,7 +114,7 @@ inline void launch_programs() {
 				fclose(unit_file);
 				
 				if (valid && message)
-					printf("%s", message_text);
+					printf("%s\n", message_text);
 				fflush(stdout);
 				
 				if (valid && exec){
