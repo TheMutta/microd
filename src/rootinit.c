@@ -69,6 +69,7 @@ inline void launch_programs() {
 				char* arg;
 				bool message = false;
 				char* message_text = malloc(1024);
+				bool restart = false;
 				unsigned long file_size;
 
 				if(unit_file) {
@@ -100,6 +101,13 @@ inline void launch_programs() {
 								lines = strtok(NULL,"\n");
 								message = true;
 								message_text = lines;
+							} else if (strcmp(lines, "[Restart]") == 0) {
+								lines = strtok(NULL,"\n");
+								if (strcmp(lines, "always") == 0) {
+									restart = true;
+								} else if(strcmp(lines, "never") == 0) {
+									restart = false;
+								}
 							} else if (strcmp(lines, "[Requires]") == 0) {
 								warning("[Requires] instruction not yet implemented");
 							} 
@@ -120,7 +128,7 @@ inline void launch_programs() {
 				if (valid && exec){
 					pid_t controller = fork();
 					if (controller == 0) {
-						while (true) {
+						do {
 							pid_t daemon = fork();
 							if (daemon == 0) {
 								char* args[256];
@@ -138,10 +146,18 @@ inline void launch_programs() {
 								perror("execvp");
 								exit(1);
 							} else {
-								waitpid(daemon,0,0);
-								// Revive it
+								int status;
+								waitpid(daemon,&status,0);
+								
+								int exitcode = WEXITSTATUS(status);
+								if(exitcode != 0) {
+									warning("Daemon failed!");
+									printf("PID %d %s failed with error code %d, not restarting.\n", daemon, executable, exitcode);
+									fflush(stdout);
+									restart = false;
+								}
 							}
-						}
+						} while (restart);
 
 						exit(1);
 					}
