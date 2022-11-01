@@ -7,4 +7,4 @@ The init has three phases of operation:
  - root phase: this phase is happens when the rootfs is mounted. Secondary disks are mounted, startup scripts are executed and daemons are launched.
  - post-init phase: this fase happens once the programs and daemons are launched. The init remains quiet and performs housekeeping jobs, such as controlling the status of children and restarting them if necessary.
 ## Is it complete?
-No, and probably it will never be.
+No, and probably it will never be, as I'll be continuously adding more features
