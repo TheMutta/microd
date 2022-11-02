@@ -1,7 +1,8 @@
 #include "postinit.h"
 
 inline void post_init(bool debug) {
-	printf("Init has entered quiet mode.\nUnless debug mode is active, only critical messages will be sent.\n");
+	std::cout << "Init has entered quiet mode." << std::endl
+		  << "Unless debug mode is active, only critical messages will be sent." << std::endl;
 	
 	if (debug)
 		ok("Housekeeping started.");
