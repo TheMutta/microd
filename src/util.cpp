@@ -19,16 +19,16 @@ inline void debug_shell() {
 	printf("Executing debug shell.\nTo continue with the init process, exit the shell.\n"
 	       "If this comes after a PANIC, after closing the shell the init will send a SIGUSR1 (reboot)!\n");
 
-	pid_t shell = fork();
+	pid_t shell_pid = fork();
 
-	if (shell == 0) {
+	if (shell_pid == 0) {
 		char *argv[] = {"busybox", "setsid", "cttyhack", "sh", NULL};
 		char *env[] = {"PATH=/bin:/sbin", NULL};
 		execve("/bin/busybox", argv, env);
 		perror("execve");
 		exit(1);
 	} else {
-		waitpid(pid, 0, 0);
+		waitpid(shell_pid, 0, 0);
 		ok("Exited debug shell");
 	}
 }
