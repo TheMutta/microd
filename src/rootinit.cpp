@@ -1,6 +1,6 @@
 #include "rootinit.h"
 
-inline void remount_root_rw(char* rootfs, char* rootfs_type, unsigned long rootfs_mount_flags) {
+void remount_root_rw(char* rootfs, char* rootfs_type, unsigned long rootfs_mount_flags) {
 	std::cout << "Remounting root as read-write." << std::endl;
 	if (mount(rootfs, "/", rootfs_type, rootfs_mount_flags, "") !=0 ) {
 		panic("Failed to remount rootfs. Cannot proceed.");
@@ -11,7 +11,7 @@ inline void remount_root_rw(char* rootfs, char* rootfs_type, unsigned long rootf
 	return;
 }
 
-inline void mount_drive(char* drv, char* fstype, char* destdir, unsigned long flags) {
+void mount_drive(char* drv, char* fstype, char* destdir, unsigned long flags) {
 	std::cout << "Mounting " << drv << " in " << destdir << "..." << std::endl;
 	if (mount(drv, destdir, fstype, flags, "") !=0 ) {
 		warning("Failed to mount! The system may not behave correctly.");
@@ -22,7 +22,7 @@ inline void mount_drive(char* drv, char* fstype, char* destdir, unsigned long fl
 	return;
 }
 
-inline void startup_scripts() {
+void startup_scripts() {
 	std::cout << "Running startup scripts..." << std::endl;
 
 	pid_t pid=fork();
@@ -41,7 +41,7 @@ inline void startup_scripts() {
 }
 
 
-inline void launch_programs() {
+void launch_programs() {
 	std::cout << "Launching programs..." << std::endl;
 
 
@@ -122,7 +122,7 @@ inline void launch_programs() {
 				fclose(unit_file);
 				
 				if (valid && message)
-					printf("%s\n", message_text);
+					std::cout << message_text << std::endl;
 				fflush(stdout);
 				
 				if (valid && exec){
@@ -138,7 +138,7 @@ inline void launch_programs() {
 								args[0] = executable_cmd;
 								while (arg != NULL) {
 									arg = strtok(NULL, " ");
-									printf("%s", arg);
+									std::cout << arg << std::endl;
 									args[i] = arg;
 									i++;
 								}
@@ -152,7 +152,7 @@ inline void launch_programs() {
 								int exitcode = WEXITSTATUS(status);
 								if(exitcode != 0) {
 									warning("Daemon failed!");
-									printf("PID %d %s failed with error code %d, not restarting.\n", daemon, executable, exitcode);
+									std::cout << "PID " << daemon << " " << executable << " failed with error code " << exitcode << ", not restarting." << std::endl;
 									fflush(stdout);
 									restart = false;
 								}
@@ -162,14 +162,14 @@ inline void launch_programs() {
 						exit(1);
 					}
 				} else {
-					printf("Unit not valid!\n");
+					std::cout << "Unit not valid!" << std::endl;
 				}
 			} else if (strcmp(file.extension, "disabled") == 0) {
-				printf("Ignoring %s...\n", file_name);
+				std::cout << "Ignoring " << file_name << "..." << std::endl;
 				// It's disabled, ignore it
 			} else if (strcmp(file.extension, "sh") == 0) {
 				// Executing it as a shell script
-				printf("Executing shell script %s...\n", file_name);
+				std::cout << "Executing shell script " << file_name << "..." << std::endl;
 				pid_t pid = fork();
 				if (pid == 0) {
 					execl(file_name, file.name, (char*)NULL);
@@ -178,7 +178,7 @@ inline void launch_programs() {
 				} 
 			} else {
 				// Executing it as a normal executable
-				printf("Executing file %s...\n", file_name);
+				std::cout << "Executing file " << file_name << "..." << std::endl;
 				pid_t pid = fork();
 				if (pid == 0) {
 					execl(file_name, file.name, (char*)NULL);
