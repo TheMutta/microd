@@ -16,8 +16,7 @@
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 #include <unistd.h>
-#include <stdbool.h>
-#include <stdio.h>
+#include <iostream>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -60,7 +59,7 @@ void root_init();
 int main(int argc, char** argv) {
 
 	if (getpid() != 1) {
-		printf("Not running as PID 1.\n");
+		std::cout << "Not running as PID 1." << std::endl;
 		exit(0);
 	}
 
@@ -96,7 +95,7 @@ int main(int argc, char** argv) {
 		case SINGLE:
 			warning("Starting runlevel 1");
 			debug_shell();
-			printf("Passing to runlevel 5...\n");
+			std::cout << "Passing to runlevel 5..." << std::endl;
 		case MULTI:
 			ok("Started runlevel 2");
 		case MULTINET:
@@ -123,31 +122,30 @@ inline void parse_arguments(int argc, char** argv) {
 		else if(strcmp(argv[i], "init_debug") == 0)
 			init_arguments.is_debug = true;
 		else if(strcmp(argv[i], "0") == 0)
-			boot_runlevel = 0;
+			boot_runlevel = OFF;
 		else if(strcmp(argv[i], "1") == 0)
-			boot_runlevel = 1;
+			boot_runlevel = SINGLE;
 		else if(strcmp(argv[i], "2") == 0)
-			boot_runlevel = 2;
+			boot_runlevel = MULTI;
 		else if(strcmp(argv[i], "3") == 0)
-			boot_runlevel = 3;
+			boot_runlevel = MULTINET;
 		else if(strcmp(argv[i], "4") == 0)
-			boot_runlevel = 4;
+			boot_runlevel = MULTIP;
 		else if(strcmp(argv[i], "5") == 0)
-			boot_runlevel = 5;
+			boot_runlevel = FULL;
 		else if(strcmp(argv[i], "6") == 0)
-			boot_runlevel = 6;
+			boot_runlevel = REBOOT;
 	}
 }
 
 inline void initrd_init() {
 	ok("Started initrd /init");
-	printf("Hello, world!\n"
-	       "Microd version %s, Copyright (C) %s %s\n"
-	       "Microd comes with ABSOLUTELY NO WARRANTY.\n"
-	       "This is free software, and you are welcome to redistribute it.\n"
-	       "under certain conditions. Please consult the LICENSE file,\n"
-	       "located in the program's repository, for more information.\n",
-	       version, date, author);
+	std::cout << "Hello, world!" << std::endl
+	          << "Microd version " << version << ", Copyright (C) " << date << " " << author << std::endl
+	          << "Microd comes with ABSOLUTELY NO WARRANTY." << std::endl
+	          << "This is free software, and you are welcome to redistribute it." << std::endl
+		  << "under certain conditions. Please consult the LICENSE file," << std::endl
+	          << "located in the program's repository, for more information." << std::endl;
 
 	mount_specialfs();
 	ok("Finished mounting filesystems.");
@@ -162,14 +160,13 @@ inline void initrd_init() {
 
 inline void root_init() {
 	ok("Started root /init");
-	printf("Welcome to Linux!\n\a"
-	       "Hello, World!\n"
-	       "Microd version %s, Copyright (C) %s %s\n"
-	       "Microd comes with ABSOLUTELY NO WARRANTY.\n"
-	       "This is free software, and you are welcome to redistribute it.\n"
-	       "under certain conditions. Please consult the LICENSE file,\n"
-	       "located in the program's repository, for more information.\n",
-	       version, date, author);
+	std::cout << "Welcome from Linux!" << std::endl
+		  << "Hello, world!" << std::endl
+	          << "Microd version " << version << ", Copyright (C) " << date << " " << author << std::endl
+	          << "Microd comes with ABSOLUTELY NO WARRANTY." << std::endl
+	          << "This is free software, and you are welcome to redistribute it." << std::endl
+		  << "under certain conditions. Please consult the LICENSE file," << std::endl
+	          << "located in the program's repository, for more information." << std::endl;
 
 	mount_specialfs();
 
