@@ -1,7 +1,7 @@
 #include "rdinit.h"
 
 inline void mount_root(char* rootfs, char* rootfs_type, unsigned long rootfs_mount_flags) {
-	printf("Mounting %s as a %s root device.\n", rootfs, rootfs_type);
+	std::cout << "Mounting " << rootfs << " as a " << rootfs_type << " root device." << std::endl;
 	if (mount(rootfs, "/new_root", rootfs_type, rootfs_mount_flags, "") !=0 ) {
 		panic("Failed to mount rootfs on /new_root. Cannot proceed.");
 	} else {
