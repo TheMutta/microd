@@ -1,6 +1,6 @@
 #include "mount_special.h"
 
-inline void mount_specialfs() {
+void mount_specialfs() {
 	printf("Mounting filesystems...\n");
 
 	printf("Mounting devtmpfs in /dev...\n");
