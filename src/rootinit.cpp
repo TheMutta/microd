@@ -1,7 +1,7 @@
 #include "rootinit.h"
 
 inline void remount_root_rw(char* rootfs, char* rootfs_type, unsigned long rootfs_mount_flags) {
-	printf("Remounting root as read-write.\n");
+	std::cout << "Remounting root as read-write." << std::endl;
 	if (mount(rootfs, "/", rootfs_type, rootfs_mount_flags, "") !=0 ) {
 		panic("Failed to remount rootfs. Cannot proceed.");
 	} else {
@@ -12,7 +12,7 @@ inline void remount_root_rw(char* rootfs, char* rootfs_type, unsigned long rootf
 }
 
 inline void mount_drive(char* drv, char* fstype, char* destdir, unsigned long flags) {
-	printf("Mounting %s in %s...\n", drv, destdir);
+	std::cout << "Mounting " << drv << " in " << destdir << "..." << std::endl;
 	if (mount(drv, destdir, fstype, flags, "") !=0 ) {
 		warning("Failed to mount! The system may not behave correctly.");
 	} else {
@@ -23,7 +23,7 @@ inline void mount_drive(char* drv, char* fstype, char* destdir, unsigned long fl
 }
 
 inline void startup_scripts() {
-	printf("Running startup scripts...\n");
+	std::cout << "Running startup scripts..." << std::endl;
 
 	pid_t pid=fork();
 
@@ -42,7 +42,7 @@ inline void startup_scripts() {
 
 
 inline void launch_programs() {
-	printf("Launching programs...\n");
+	std::cout << "Launching programs..." << std::endl;
 
 
 	tinydir_dir dir;
@@ -58,17 +58,17 @@ inline void launch_programs() {
 			strcat(file_name, file.name);
 			if (strcmp(file.extension, "unit") == 0) {
 				// Executing it as an unit
-				printf("Executing unit %s...\n", file_name);
+				std::cout << "Executing unit " << file_name << "..." << std::endl;
 				FILE *unit_file = fopen(file_name, "r");
-				char* buffer;
-				char* lines;
+				char *buffer;
+				char *lines;
 				bool valid = false;
 				bool exec = false;
-				char* executable = malloc(2048);
-				char* executable_cmd = malloc(512);
-				char* arg;
+				char *executable;
+				char *executable_cmd;
+				char *arg;
 				bool message = false;
-				char* message_text = malloc(1024);
+				std::string message_text;
 				bool restart = false;
 				unsigned long file_size;
 
@@ -77,8 +77,8 @@ inline void launch_programs() {
 					file_size = ftell(unit_file);
 					fseek(unit_file, 0 , SEEK_SET);
 
-					buffer = malloc(file_size);
-					lines = malloc(file_size);
+					buffer = new char[file_size];
+					lines = new char[file_size];
 
 					char ch;
 					int i = 0;
