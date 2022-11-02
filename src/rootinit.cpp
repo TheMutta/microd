@@ -115,8 +115,8 @@ void launch_programs() {
 						lines = strtok(NULL,"\n");
 					}
 
-					delete buffer;
-					delete lines;
+					delete[] buffer;
+					delete[] lines;
 				}
 
 				fclose(unit_file);
