@@ -1,4 +1,4 @@
-CC = gcc
+CC = g++
 CFLAGS = -static -Wall -Os
 LDFLAGS = -static
 
