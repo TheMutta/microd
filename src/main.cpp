@@ -24,21 +24,16 @@
 #include <signal.h>
 
 #include "rdinit.h"
-#include "rootinit.h"
 #include "mount_special.h"
 #include "util.h"
 #include "postinit.h"
+#include "rootutils.h"
 
 const char* version = "0.2.0-alpha-rc1";
 const char* author = "Mutta Filippo";
 const char* date = "2022-2022";
 
-struct arguments {
-	bool is_in_root;
-	bool is_debug;
-	char* rootdrv;
-	char* rootfstype;
-} init_arguments;
+util::arguments init_arguments;
 
 enum runlevel {
 	OFF,
@@ -48,13 +43,12 @@ enum runlevel {
 	MULTIP,
 	FULL,
 	REBOOT
-} curr_runlevel, boot_runlevel;
+} boot_runlevel;
 
 void sig_handler(int signum);
 
 void parse_arguments(int argc, char** argv);
 void initrd_init();
-void root_init();
 
 int main(int argc, char** argv) {
 
@@ -83,19 +77,42 @@ int main(int argc, char** argv) {
 	parse_arguments(argc, argv);
 		
 	if (!init_arguments.is_in_root) {
-		initrd_init();
+		std::cout << "Hello, world!" << std::endl
+			  << "Microd version " << version << ", Copyright (C) " << date << " " << author << std::endl
+		          << "Microd comes with ABSOLUTELY NO WARRANTY." << std::endl
+		          << "This is free software, and you are welcome to redistribute it." << std::endl
+			  << "under certain conditions. Please consult the LICENSE file," << std::endl
+		          << "located in the program's repository, for more information." << std::endl;
+
+		initrd_init(init_arguments);
 	}
+
+	util::ok("Started root /init");
+
+	mount_specialfs();
+
+	root::remount_root_rw(init_arguments.rootdrv, init_arguments.rootfstype, MS_REMOUNT | MS_NOATIME);
+
+	util::ok("Finished mounting");
+
+	std::cout << "Hello, world!" << std::endl
+	          << "Microd version " << version << ", Copyright (C) " << date << " " << author << std::endl
+	          << "Microd comes with ABSOLUTELY NO WARRANTY." << std::endl
+	          << "This is free software, and you are welcome to redistribute it." << std::endl
+		  << "under certain conditions. Please consult the LICENSE file," << std::endl
+	          << "located in the program's repository, for more information." << std::endl;
 
 	switch (boot_runlevel) {
 		case OFF:
+			util::warning("Turning off...");
+			util::change_state(util::sys_poweroff);
 		case REBOOT:
 			util::warning("Rebooting...");
-			util::reboot();
+			util::change_state(util::sys_halt);
 			break;
 		case SINGLE:
 			util::warning("Starting runlevel 1");
-			util::debug_shell();
-			std::cout << "Passing to runlevel 5..." << std::endl;
+			util::change_state(util::sys_runlevel_1);
 		case MULTI:
 			util::ok("Started runlevel 2");
 		case MULTINET:
@@ -104,7 +121,7 @@ int main(int argc, char** argv) {
 			util::ok("Started runlevel 4");
 		case FULL:
 			util::ok("Started runlevel 5");
-			root_init();
+			util::change_state(util::sys_runlevel_5);
 			break;
 	}
 
@@ -112,7 +129,7 @@ int main(int argc, char** argv) {
 
 	util::panic("Something is wrong. We have passed the post_init() function.");
 
-	util::reboot();
+	util::change_state(util::sys_halt);
 }
 
 inline void parse_arguments(int argc, char** argv) {
@@ -138,54 +155,7 @@ inline void parse_arguments(int argc, char** argv) {
 	}
 }
 
-inline void initrd_init() {
-	util::ok("Started initrd /init");
-	std::cout << "Hello, world!" << std::endl
-	          << "Microd version " << version << ", Copyright (C) " << date << " " << author << std::endl
-	          << "Microd comes with ABSOLUTELY NO WARRANTY." << std::endl
-	          << "This is free software, and you are welcome to redistribute it." << std::endl
-		  << "under certain conditions. Please consult the LICENSE file," << std::endl
-	          << "located in the program's repository, for more information." << std::endl;
-
-	mount_specialfs();
-	util::ok("Finished mounting filesystems.");
-
-	if (init_arguments.is_debug) {
-		util::debug_shell();
-	}
-		
-	mount_root(init_arguments.rootdrv, init_arguments.rootfstype, MS_RDONLY | MS_NOATIME);
-	switch_root();
-}
-
-inline void root_init() {
-	util::ok("Started root /init");
-	std::cout << "Welcome from Linux!" << std::endl
-		  << "Hello, world!" << std::endl
-	          << "Microd version " << version << ", Copyright (C) " << date << " " << author << std::endl
-	          << "Microd comes with ABSOLUTELY NO WARRANTY." << std::endl
-	          << "This is free software, and you are welcome to redistribute it." << std::endl
-		  << "under certain conditions. Please consult the LICENSE file," << std::endl
-	          << "located in the program's repository, for more information." << std::endl;
-
-	mount_specialfs();
-
-	remount_root_rw(init_arguments.rootdrv, init_arguments.rootfstype, MS_REMOUNT | MS_NOATIME);
-
-	util::ok("Finished mounting");
-
-	startup_scripts();
-
-	util::ok("Finished running startups scripts");
-	
-	launch_programs();
-
-	util::ok("Finished launching programs");
-
-	util::ok("System is booted!!!");
-}
-
 void sig_handler(int signum) {
 	(void)signum;
-	util::reboot();
+	util::change_state(util::sys_halt);
 }
