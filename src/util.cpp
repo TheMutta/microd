@@ -1,5 +1,7 @@
 #include "util.h"
 
+#include "rootutils.h"
+
 namespace util {
 
 void exec(const std::vector<std::string> &argv) {
@@ -33,7 +35,7 @@ void ok(std::string message) {
 void panic(std::string message) {
 	std::cout << "[\033[0;31mPANIC\033[0m] " << message << std::endl;
 	debug_shell();
-	reboot();
+	change_state(sys_halt);
 }
 
 void warning(std::string message) {
@@ -59,9 +61,60 @@ void debug_shell() {
 	}
 }
 
-void reboot() {
+void change_state(change_action action) {
+	for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
+		std::cout << "Sending SIGTERM to " << unit::managed_units[i].pid << std::endl;
+		kill(unit::managed_units[i].pid, SIGTERM);
+	}
+
+	sleep(2);
+
+	for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
+		if(waitpid(unit::managed_units[i].pid, &unit::managed_units[i].status, WNOHANG) != 0) {
+			if (WIFEXITED(unit::managed_units[i].status)) {
+				unit::managed_units.erase(unit::managed_units.begin() + i);
+			}
+		}
+	}
+
+
+	for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
+		std::cout << "Sending SIGKILL to " << unit::managed_units[i].pid << std::endl;
+		kill(unit::managed_units[i].pid, SIGKILL);
+	}
+
 	sync();
-	syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_RESTART, 0);
+	
+	switch (action) {
+		default:
+		case sys_reboot:
+			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_RESTART, 0);
+			break;
+		case sys_poweroff:
+			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_POWER_OFF, 0);
+			break;
+		case sys_halt:
+			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_HALT, 0);
+			break;
+		case sys_suspend:
+			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_SW_SUSPEND, 0);
+			break;
+		case sys_kexec:
+			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_KEXEC, 0);
+			break;
+		case sys_runlevel_1:
+			debug_shell();
+			change_state(sys_runlevel_5);
+			break;
+		case sys_runlevel_2:
+		case sys_runlevel_3:
+		case sys_runlevel_4:
+		case sys_runlevel_5:
+			// Do something...
+			root::startup_scripts();
+			root::launch_programs();
+			break;
+	}
 }
 
 }
