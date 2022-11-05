@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -static -Wall -Os
+CFLAGS = -static -Wall -Os -fpermissive
 LDFLAGS = -static
 
 SRCDIR := src
