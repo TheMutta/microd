@@ -104,8 +104,6 @@ void change_state(change_action action) {
 			break;
 		case sys_runlevel_1:
 			debug_shell();
-			change_state(sys_runlevel_5);
-			break;
 		case sys_runlevel_2:
 		case sys_runlevel_3:
 		case sys_runlevel_4:

@@ -113,6 +113,7 @@ int main(int argc, char** argv) {
 		case SINGLE:
 			util::warning("Starting runlevel 1");
 			util::change_state(util::sys_runlevel_1);
+			break;
 		case MULTI:
 			util::ok("Started runlevel 2");
 		case MULTINET:
