@@ -1,0 +1,85 @@
+#include "unit.h"
+
+namespace unit {
+
+enum valid_actions { action_start,
+		     action_executable,
+		     action_message,
+		     action_requires,
+		     action_restart
+		   };
+
+std::map<std::string, valid_actions> mapped_actions;
+
+
+void init() {
+	mapped_actions["start"] = action_start;
+	mapped_actions["exec"] = action_executable;
+	mapped_actions["mesg"] = action_message;
+	mapped_actions["before"] = action_requires;
+	mapped_actions["restart"] = action_restart;
+}
+
+int run_unit(char *unit_file) {
+	std::ifstream file;
+	std::string line,
+		    action,
+		    runlevel,
+		    executable_cmd,
+		    message_text,
+		    required_unit,
+		    restart;
+
+	file.open(unit_file);
+
+	if (file.is_open()) {
+		while (std::getline(file, line)) {
+			std::stringstream curr_line(line);
+			std::getline(curr_line, action, ' ' );
+			switch (mapped_actions[action]) {
+				case action_start:
+					std::getline(curr_line, runlevel);
+					break;
+				case action_executable:
+					std::getline(curr_line, executable_cmd);
+					break;
+				case action_message:
+					std::getline(curr_line, message_text);
+					break;
+				case action_requires:
+					std::getline(curr_line, required_unit);
+					break;
+				case action_restart:
+					std::getline(curr_line, restart);
+					break;
+				default:
+					std::cout << "Action " << action << " not valid" << std::endl;
+					break;
+			}
+		}
+
+		std::cout << unit_file << " says: " << message_text << std::endl;
+
+		file.close();
+		
+		std::stringstream parse_exec(executable_cmd);
+		std::string value;
+		std::vector<std::string> executable;
+
+		while (std::getline(parse_exec, value, ' ')) {
+			executable.push_back(value);
+		}
+
+		pid_t daemon = fork();
+		if (daemon == 0) {
+			util::exec(executable);
+			exit(1);
+		} else {
+		}
+
+		return 0;
+	} else {
+		return -1;
+	}
+}
+}
