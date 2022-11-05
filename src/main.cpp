@@ -57,16 +57,7 @@ int main(int argc, char** argv) {
 		exit(0);
 	}
 
-	signal(SIGINT, sig_handler);
-	signal(SIGHUP, sig_handler);
-	signal(SIGQUIT, sig_handler);
-	signal(SIGKILL, sig_handler);
-	signal(SIGTRAP, sig_handler);
-	signal(SIGABRT, sig_handler);
-	signal(SIGFPE, sig_handler);
-	signal(SIGUSR1, sig_handler);
-	signal(SIGUSR2, sig_handler);
-
+	signal(NSIG, sig_handler);
 
 	init_arguments.is_debug = false;
 	init_arguments.is_in_root = false;
@@ -157,6 +148,18 @@ inline void parse_arguments(int argc, char** argv) {
 }
 
 void sig_handler(int signum) {
-	(void)signum;
-	util::change_state(util::sys_halt);
+	switch(signum) {
+		case SIGTERM:
+			util::change_state(util::sys_reboot);
+			break;
+		case SIGUSR1:
+			util::change_state(util::sys_halt);
+			break;
+		case SIGUSR2:
+			util::change_state(util::sys_poweroff);
+			break;
+		default:
+			// Signal not recognized
+			break;
+	}
 }
