@@ -24,6 +24,7 @@
 #include <signal.h>
 
 #include "rdinit.h"
+#include "postinit.h"
 #include "mount_special.h"
 #include "util.h"
 #include "rootutils.h"
