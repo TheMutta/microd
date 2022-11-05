@@ -26,7 +26,6 @@
 #include "rdinit.h"
 #include "mount_special.h"
 #include "util.h"
-#include "postinit.h"
 #include "rootutils.h"
 
 const char* version = "0.2.0-alpha-rc2";
@@ -48,7 +47,6 @@ enum runlevel {
 void sig_handler(int signum);
 
 void parse_arguments(int argc, char** argv);
-void initrd_init();
 
 int main(int argc, char** argv) {
 
@@ -99,6 +97,7 @@ int main(int argc, char** argv) {
 		case OFF:
 			util::warning("Turning off...");
 			util::change_state(util::sys_poweroff);
+			break;
 		case REBOOT:
 			util::warning("Rebooting...");
 			util::change_state(util::sys_halt);
@@ -110,12 +109,15 @@ int main(int argc, char** argv) {
 		case MULTI:
 			util::ok("Started runlevel 2");
 			util::change_state(util::sys_runlevel_2);
+			break;
 		case MULTINET:
 			util::ok("Started runlevel 3");
 			util::change_state(util::sys_runlevel_3);
+			break;
 		case MULTIP:
 			util::ok("Started runlevel 4");
 			util::change_state(util::sys_runlevel_4);
+			break;
 		case FULL:
 			util::ok("Started runlevel 5");
 			util::change_state(util::sys_runlevel_5);
