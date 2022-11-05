@@ -1,5 +1,31 @@
 #include "util.h"
 
+namespace util {
+
+void exec(const std::vector<std::string> &argv) {
+	if (argv.size() == 0) { 
+		throw std::invalid_argument("At least one argument must be provided, being the file of "
+				            "the binary to execute");
+	}
+	
+	w_execvp(argv[0], argv);
+}
+
+void w_execvp(const std::string &file, const std::vector<std::string> &argv) {
+	std::vector<char *> vec_cp;
+	vec_cp.reserve(argv.size() + 1);
+
+	for (auto const& s : argv)
+		vec_cp.push_back(const_cast<char*>(s.c_str()));
+
+	vec_cp.push_back(nullptr);
+
+	execvp(file.c_str(), vec_cp.data());
+
+	perror("execvp");
+
+}
+
 void ok(std::string message) {
 	std::cout << "[\033[0;32mOK\033[0m] " << message << std::endl;
 }
@@ -36,4 +62,6 @@ void debug_shell() {
 void reboot() {
 	sync();
 	syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_RESTART, 0);
+}
+
 }
