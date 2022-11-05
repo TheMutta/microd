@@ -2,6 +2,9 @@
 
 namespace unit {
 
+
+std::vector<Unit> managed_units;
+
 enum valid_actions { action_start,
 		     action_executable,
 		     action_message,
@@ -75,6 +78,9 @@ int run_unit(char *unit_file) {
 			util::exec(executable);
 			exit(1);
 		} else {
+			managed_units.push_back(Unit());
+			managed_units[managed_units.size() - 1].file = executable_cmd;
+			managed_units[managed_units.size() - 1].pid = daemon;
 		}
 
 		return 0;

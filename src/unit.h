@@ -11,6 +11,14 @@
 
 namespace unit {
 
+struct Unit {
+	std::string file;
+	pid_t pid;
+	int status;
+};
+
+extern std::vector<Unit> managed_units;
+
 int run_unit(char *unit_file);
 void init();
 

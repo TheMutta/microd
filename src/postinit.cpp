@@ -7,6 +7,8 @@ void post_init(bool debug) {
 	if (debug)
 		util::ok("Housekeeping started.");
 
+	std::cout << "Currently running units: " << unit::managed_units.size() << std::endl;
+
 	while (true) {
 		// Tick tock
 		sleep(1);
