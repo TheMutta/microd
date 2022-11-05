@@ -18,8 +18,8 @@ void post_init(bool debug) {
 					std::cout << "Unit " << unit::managed_units[i].file << " PID " <<  unit::managed_units[i].pid << " has status " << unit::managed_units[i].status << std::endl;
 					if (WIFEXITED(unit::managed_units[i].status)) {
 						std::string unit_name;
-						switch (WEXITSTATUS(unit::managed_units[i].status)) {
-							case 0:
+						if (WEXITSTATUS(unit::managed_units[i].status) == 0) {
+							if (unit::managed_units[i].restart && unit::managed_units[i].restart_if_stopped) {
 								std::cout << "Process " << unit::managed_units[i].file
 									  << " exited successfully. Restarting..." << std::endl;
 								unit_name = unit::managed_units[i].file;
@@ -30,11 +30,16 @@ void post_init(bool debug) {
 								unit::run_unit(unit_name);
 								if (debug)
 									std::cout << "Launched unit successfully!" << std::endl;
-								break;
-							default:
-								std::cout << "Process " << unit::managed_units[i].file << " exited unsuccessfully. Not restarting..." << std::endl;
+							} else {
+								std::cout << "Process " << unit::managed_units[i].file
+									  << " exited successfully." << std::endl;
 								unit::managed_units.erase(unit::managed_units.begin() + i);
-								break;
+
+							}
+						} else {
+							std::cout << "Process " << unit::managed_units[i].file << " exited unsuccessfully. Not restarting..." << std::endl;
+							unit::managed_units.erase(unit::managed_units.begin() + i);
+							break;
 						}
 
 						break;

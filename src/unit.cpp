@@ -83,6 +83,15 @@ int run_unit(std::string unit_file) {
 		managed_units[managed_units.size() - 1].file = unit_file;
 		managed_units[managed_units.size() - 1].pid = daemon;
 
+		if (restart == "always") {
+			managed_units[managed_units.size() - 1].restart = true;
+			managed_units[managed_units.size() - 1].restart_if_stopped = true;
+		} else if (restart == "unless stopped") {
+			managed_units[managed_units.size() - 1].restart = true;
+		} else {
+			// Is either never or not valid
+		}
+
 		return 0;
 	} else {
 		return -1;

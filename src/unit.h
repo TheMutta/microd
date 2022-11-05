@@ -15,6 +15,9 @@ struct Unit {
 	std::string file;
 	pid_t pid;
 	int status;
+	bool restart = false;
+	bool restart_if_stopped = false;
+	bool is_stopped = false; // Unused
 };
 
 extern std::vector<Unit> managed_units;
