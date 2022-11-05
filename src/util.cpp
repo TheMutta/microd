@@ -109,7 +109,6 @@ void change_state(change_action action) {
 		case sys_runlevel_3:
 		case sys_runlevel_4:
 		case sys_runlevel_5:
-			// Do something...
 			root::startup_scripts();
 			root::launch_programs();
 			break;

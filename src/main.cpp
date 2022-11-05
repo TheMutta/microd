@@ -11,6 +11,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
+	signal(SIGTERM, sig_handler);
 //  You should have received a copy of the GNU General Public License along
 // with this program; if not, write to the Free Software Foundation, Inc.,
 // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -57,7 +58,9 @@ int main(int argc, char** argv) {
 		exit(0);
 	}
 
-	signal(NSIG, sig_handler);
+	signal(SIGTERM, sig_handler);
+	signal(SIGUSR1, sig_handler);
+	signal(SIGUSR2, sig_handler);
 
 	init_arguments.is_debug = false;
 	init_arguments.is_in_root = false;
@@ -107,10 +110,13 @@ int main(int argc, char** argv) {
 			break;
 		case MULTI:
 			util::ok("Started runlevel 2");
+			util::change_state(util::sys_runlevel_2);
 		case MULTINET:
 			util::ok("Started runlevel 3");
+			util::change_state(util::sys_runlevel_3);
 		case MULTIP:
 			util::ok("Started runlevel 4");
+			util::change_state(util::sys_runlevel_4);
 		case FULL:
 			util::ok("Started runlevel 5");
 			util::change_state(util::sys_runlevel_5);
@@ -160,6 +166,7 @@ void sig_handler(int signum) {
 			break;
 		default:
 			// Signal not recognized
+			std::cout << "Recieved unrecognized signal: " << signum << std::endl;
 			break;
 	}
 }
