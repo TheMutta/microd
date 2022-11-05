@@ -62,25 +62,26 @@ void debug_shell() {
 }
 
 void change_state(change_action action) {
-	for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-		std::cout << "Sending SIGTERM to " << unit::managed_units[i].pid << std::endl;
-		kill(unit::managed_units[i].pid, SIGTERM);
-	}
+	if (unit::managed_units.size() > 0) {
+		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
+			std::cout << "Sending SIGTERM to " << unit::managed_units[i].pid << std::endl;
+			kill(unit::managed_units[i].pid, SIGTERM);
+		}
 
-	sleep(2);
+		sleep(2);
 
-	for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-		if(waitpid(unit::managed_units[i].pid, &unit::managed_units[i].status, WNOHANG) != 0) {
-			if (WIFEXITED(unit::managed_units[i].status)) {
-				unit::managed_units.erase(unit::managed_units.begin() + i);
+		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
+			if(waitpid(unit::managed_units[i].pid, &unit::managed_units[i].status, WNOHANG) != 0) {
+				if (WIFEXITED(unit::managed_units[i].status)) {
+					unit::managed_units.erase(unit::managed_units.begin() + i);
+				}
 			}
 		}
-	}
 
-
-	for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-		std::cout << "Sending SIGKILL to " << unit::managed_units[i].pid << std::endl;
-		kill(unit::managed_units[i].pid, SIGKILL);
+		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
+			std::cout << "Sending SIGKILL to " << unit::managed_units[i].pid << std::endl;
+			kill(unit::managed_units[i].pid, SIGKILL);
+		}
 	}
 
 	sync();
