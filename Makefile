@@ -12,7 +12,10 @@ SRC = $(call rwildcard,$(SRCDIR),*.cpp)
 OBJS = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRC))
 DIRS = $(wildcard $(SRCDIR)/*)
 
-mutta-console: $(OBJS) link
+init: $(OBJS) link
+	@ echo !==== STRIPPING
+	@ strip ./init
+	@ echo !==== DONE
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@ echo !==== COMPILING $^
@@ -21,7 +24,7 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	
 link:
 	@ echo !==== LINKING
-	$(CC) $(LDFLAGS) $(OBJS) -o mutta-init
+	$(CC) $(LDFLAGS) $(OBJS) -o init
 
 clean:
 	@ echo !==== CLEANING
