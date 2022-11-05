@@ -89,30 +89,30 @@ int main(int argc, char** argv) {
 	switch (boot_runlevel) {
 		case OFF:
 		case REBOOT:
-			warning("Rebooting...");
-			reboot();
+			util::warning("Rebooting...");
+			util::reboot();
 			break;
 		case SINGLE:
-			warning("Starting runlevel 1");
-			debug_shell();
+			util::warning("Starting runlevel 1");
+			util::debug_shell();
 			std::cout << "Passing to runlevel 5..." << std::endl;
 		case MULTI:
-			ok("Started runlevel 2");
+			util::ok("Started runlevel 2");
 		case MULTINET:
-			ok("Started runlevel 3");
+			util::ok("Started runlevel 3");
 		case MULTIP:
-			ok("Started runlevel 4");
+			util::ok("Started runlevel 4");
 		case FULL:
-			ok("Started runlevel 5");
+			util::ok("Started runlevel 5");
 			root_init();
 			break;
 	}
 
 	post_init(init_arguments.is_debug);
 
-	panic("Something is wrong. We have passed the post_init() function.");
+	util::panic("Something is wrong. We have passed the post_init() function.");
 
-	reboot();
+	util::reboot();
 }
 
 inline void parse_arguments(int argc, char** argv) {
@@ -139,7 +139,7 @@ inline void parse_arguments(int argc, char** argv) {
 }
 
 inline void initrd_init() {
-	ok("Started initrd /init");
+	util::ok("Started initrd /init");
 	std::cout << "Hello, world!" << std::endl
 	          << "Microd version " << version << ", Copyright (C) " << date << " " << author << std::endl
 	          << "Microd comes with ABSOLUTELY NO WARRANTY." << std::endl
@@ -148,10 +148,10 @@ inline void initrd_init() {
 	          << "located in the program's repository, for more information." << std::endl;
 
 	mount_specialfs();
-	ok("Finished mounting filesystems.");
+	util::ok("Finished mounting filesystems.");
 
 	if (init_arguments.is_debug) {
-		debug_shell();
+		util::debug_shell();
 	}
 		
 	mount_root(init_arguments.rootdrv, init_arguments.rootfstype, MS_RDONLY | MS_NOATIME);
@@ -159,7 +159,7 @@ inline void initrd_init() {
 }
 
 inline void root_init() {
-	ok("Started root /init");
+	util::ok("Started root /init");
 	std::cout << "Welcome from Linux!" << std::endl
 		  << "Hello, world!" << std::endl
 	          << "Microd version " << version << ", Copyright (C) " << date << " " << author << std::endl
@@ -172,20 +172,20 @@ inline void root_init() {
 
 	remount_root_rw(init_arguments.rootdrv, init_arguments.rootfstype, MS_REMOUNT | MS_NOATIME);
 
-	ok("Finished mounting");
+	util::ok("Finished mounting");
 
 	startup_scripts();
 
-	ok("Finished running startups scripts");
+	util::ok("Finished running startups scripts");
 	
 	launch_programs();
 
-	ok("Finished launching programs");
+	util::ok("Finished launching programs");
 
-	ok("System is booted!!!");
+	util::ok("System is booted!!!");
 }
 
 void sig_handler(int signum) {
 	(void)signum;
-	reboot();
+	util::reboot();
 }

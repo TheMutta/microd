@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <iostream>
 
+#include "unit.h"
 #include "tinydir.h"
 #include "util.h"
 

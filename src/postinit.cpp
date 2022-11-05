@@ -5,7 +5,7 @@ void post_init(bool debug) {
 		  << "Unless debug mode is active, only critical messages will be sent." << std::endl;
 	
 	if (debug)
-		ok("Housekeeping started.");
+		util::ok("Housekeeping started.");
 
 	while (true) {
 		// Tick tock
