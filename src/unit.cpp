@@ -23,7 +23,7 @@ void init() {
 	mapped_actions["restart"] = action_restart;
 }
 
-int run_unit(char *unit_file) {
+int run_unit(std::string unit_file) {
 	std::ifstream file;
 	std::string line,
 		    action,
@@ -33,7 +33,7 @@ int run_unit(char *unit_file) {
 		    required_unit,
 		    restart;
 
-	file.open(unit_file);
+	file.open(unit_file.c_str());
 
 	if (file.is_open()) {
 		while (std::getline(file, line)) {
@@ -77,11 +77,11 @@ int run_unit(char *unit_file) {
 		if (daemon == 0) {
 			util::exec(executable);
 			exit(1);
-		} else {
-			managed_units.push_back(Unit());
-			managed_units[managed_units.size() - 1].file = executable_cmd;
-			managed_units[managed_units.size() - 1].pid = daemon;
 		}
+
+		managed_units.push_back(Unit());
+		managed_units[managed_units.size() - 1].file = unit_file;
+		managed_units[managed_units.size() - 1].pid = daemon;
 
 		return 0;
 	} else {

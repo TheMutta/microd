@@ -19,7 +19,7 @@ struct Unit {
 
 extern std::vector<Unit> managed_units;
 
-int run_unit(char *unit_file);
+int run_unit(std::string unit_file);
 void init();
 
 }
