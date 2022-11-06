@@ -10,7 +10,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "unit.h"
 
 namespace util {
 	struct arguments {
@@ -18,6 +17,16 @@ namespace util {
 		bool is_debug;
 		char* rootdrv;
 		char* rootfstype;
+	};
+	
+	enum runlevel {
+		OFF,
+		SINGLE,
+		MULTI,
+		MULTINET,
+		MULTIP,
+		FULL,
+		REBOOT
 	};
 
 	enum change_action { sys_reboot,
@@ -32,11 +41,15 @@ namespace util {
 			     sys_runlevel_5,
 	};
 
+	extern runlevel curr_runlevel;
+
 	void exec(const std::vector<std::string> &argv);
 	void w_execvp(const std::string &file, const std::vector<std::string> &argv);
 	void ok(std::string message);
 	void panic(std::string message);
 	void warning(std::string message);
 	void debug_shell();
+	void change_runlevel(runlevel level);
 	void change_state(change_action action);
+	void kill_units(runlevel level);
 }

@@ -4,6 +4,8 @@
 
 namespace util {
 
+runlevel curr_runlevel;
+
 void exec(const std::vector<std::string> &argv) {
 	if (argv.size() == 0) { 
 		throw std::invalid_argument("At least one argument must be provided, being the file of "
@@ -61,11 +63,13 @@ void debug_shell() {
 	}
 }
 
-void change_state(change_action action) {
+void kill_units(util::runlevel level) {
 	if (unit::managed_units.size() > 0) {
 		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-			std::cout << "Sending SIGTERM to " << unit::managed_units[i].pid << std::endl;
-			kill(unit::managed_units[i].pid, SIGTERM);
+			if(unit::managed_units[i].runlevel < level) {
+				std::cout << "Sending SIGTERM to " << unit::managed_units[i].pid << std::endl;
+				kill(unit::managed_units[i].pid, SIGTERM);
+			}
 		}
 
 		sleep(2);
@@ -79,38 +83,87 @@ void change_state(change_action action) {
 		}
 
 		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-			std::cout << "Sending SIGKILL to " << unit::managed_units[i].pid << std::endl;
-			kill(unit::managed_units[i].pid, SIGKILL);
+			if(unit::managed_units[i].runlevel < level) {
+				std::cout << "Sending SIGKILL to " << unit::managed_units[i].pid << std::endl;
+				kill(unit::managed_units[i].pid, SIGKILL);
+			}
 		}
 	}
+}
 
+void change_runlevel(runlevel level) {
+	curr_runlevel = level;
+	kill_units(curr_runlevel);
+	std::cout << "Switched to runlevel " << curr_runlevel << std::endl;
+	switch(curr_runlevel) {
+		case OFF:
+			// Die
+			break;
+		case SINGLE:
+			debug_shell();
+			// Pass on to runlevel 2
+		case MULTI:
+			root::startup_scripts();
+			root::launch_programs(curr_runlevel);
+			break;
+		case MULTINET:
+			root::startup_scripts();
+			root::launch_programs(curr_runlevel);
+			break;
+		case MULTIP:
+			root::startup_scripts();
+			root::launch_programs(curr_runlevel);
+			break;
+		case FULL:
+			root::startup_scripts();
+			root::launch_programs(curr_runlevel);
+			break;
+		case REBOOT:
+			// Die
+			break;
+
+	}
+}
+
+void change_state(change_action action) {
 	sync();
 	
 	switch (action) {
 		default:
+			break;
 		case sys_reboot:
+			change_runlevel(OFF);
 			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_RESTART, 0);
 			break;
 		case sys_poweroff:
+			change_runlevel(REBOOT);
 			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_POWER_OFF, 0);
 			break;
 		case sys_halt:
+			change_runlevel(OFF);
 			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_HALT, 0);
 			break;
 		case sys_suspend:
 			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_SW_SUSPEND, 0);
 			break;
 		case sys_kexec:
+			change_runlevel(OFF);
 			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_KEXEC, 0);
 			break;
 		case sys_runlevel_1:
-			debug_shell();
+			change_runlevel(SINGLE);
+			break;
 		case sys_runlevel_2:
+			change_runlevel(MULTI);
+			break;
 		case sys_runlevel_3:
+			change_runlevel(MULTINET);
+			break;
 		case sys_runlevel_4:
+			change_runlevel(MULTIP);
+			break;
 		case sys_runlevel_5:
-			root::startup_scripts();
-			root::launch_programs();
+			change_runlevel(FULL);
 			break;
 	}
 }
