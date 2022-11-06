@@ -13,6 +13,7 @@ namespace unit {
 
 struct Unit {
 	std::string file;
+	util::runlevel runlevel;
 	pid_t pid;
 	int status;
 	bool restart = false;
@@ -22,7 +23,7 @@ struct Unit {
 
 extern std::vector<Unit> managed_units;
 
-int run_unit(std::string unit_file);
+int run_unit(std::string unit_file, util::runlevel level);
 void init();
 
 }
