@@ -35,15 +35,7 @@ const char* date = "2022-2022";
 
 util::arguments init_arguments;
 
-enum runlevel {
-	OFF,
-	SINGLE,
-	MULTI,
-	MULTINET,
-	MULTIP,
-	FULL,
-	REBOOT
-} boot_runlevel;
+util::runlevel boot_runlevel;
 
 void sig_handler(int signum);
 
@@ -64,7 +56,7 @@ int main(int argc, char** argv) {
 	init_arguments.is_in_root = false;
 	init_arguments.rootdrv = "";
 	init_arguments.rootfstype = "";
-	boot_runlevel = OFF;
+	boot_runlevel = util::FULL;
 
 	parse_arguments(argc, argv);
 		
@@ -94,34 +86,27 @@ int main(int argc, char** argv) {
 		  << "under certain conditions. Please consult the LICENSE file," << std::endl
 	          << "located in the program's repository, for more information." << std::endl;
 
-	switch (boot_runlevel) {
-		case OFF:
-			util::warning("Turning off...");
-			util::change_state(util::sys_poweroff);
-			break;
-		case REBOOT:
-			util::warning("Rebooting...");
+	switch(boot_runlevel) {
+		case util::OFF:
 			util::change_state(util::sys_halt);
 			break;
-		case SINGLE:
-			util::warning("Starting runlevel 1");
+		case util::SINGLE:
 			util::change_state(util::sys_runlevel_1);
 			break;
-		case MULTI:
-			util::ok("Started runlevel 2");
+		case util::MULTI:
 			util::change_state(util::sys_runlevel_2);
 			break;
-		case MULTINET:
-			util::ok("Started runlevel 3");
+		case util::MULTINET:		
 			util::change_state(util::sys_runlevel_3);
 			break;
-		case MULTIP:
-			util::ok("Started runlevel 4");
+		case util::MULTIP:
 			util::change_state(util::sys_runlevel_4);
 			break;
-		case FULL:
-			util::ok("Started runlevel 5");
+		case util::FULL:
 			util::change_state(util::sys_runlevel_5);
+			break;
+		case util::REBOOT:
+			util::change_state(util::sys_reboot);
 			break;
 	}
 
@@ -139,19 +124,19 @@ inline void parse_arguments(int argc, char** argv) {
 		else if(strcmp(argv[i], "init_debug") == 0)
 			init_arguments.is_debug = true;
 		else if(strcmp(argv[i], "0") == 0)
-			boot_runlevel = OFF;
+			boot_runlevel = util::OFF;
 		else if(strcmp(argv[i], "1") == 0)
-			boot_runlevel = SINGLE;
+			boot_runlevel = util::SINGLE;
 		else if(strcmp(argv[i], "2") == 0)
-			boot_runlevel = MULTI;
+			boot_runlevel = util::MULTI;
 		else if(strcmp(argv[i], "3") == 0)
-			boot_runlevel = MULTINET;
+			boot_runlevel = util::MULTINET;
 		else if(strcmp(argv[i], "4") == 0)
-			boot_runlevel = MULTIP;
+			boot_runlevel = util::MULTIP;
 		else if(strcmp(argv[i], "5") == 0)
-			boot_runlevel = FULL;
+			boot_runlevel = util::FULL;
 		else if(strcmp(argv[i], "6") == 0)
-			boot_runlevel = REBOOT;
+			boot_runlevel = util::REBOOT;
 	}
 }
 
