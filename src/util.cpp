@@ -60,6 +60,7 @@ void debug_shell() {
 	} else {
 		waitpid(shell_pid, 0, 0);
 		ok("Exited debug shell");
+		change_state(sys_runlevel_2);
 	}
 }
 
@@ -101,7 +102,7 @@ void change_runlevel(runlevel level) {
 			break;
 		case SINGLE:
 			debug_shell();
-			// Pass on to runlevel 2
+			break;
 		case MULTI:
 			root::startup_scripts();
 			root::launch_programs(curr_runlevel);
