@@ -66,7 +66,7 @@ void debug_shell() {
 void kill_units(util::runlevel level) {
 	if (unit::managed_units.size() > 0) {
 		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-			if(unit::managed_units[i].runlevel < level) {
+			if(level == OFF || level == REBOOT || unit::managed_units[i].runlevel < level) {
 				std::cout << "Sending SIGTERM to " << unit::managed_units[i].pid << std::endl;
 				kill(unit::managed_units[i].pid, SIGTERM);
 			}
@@ -83,7 +83,7 @@ void kill_units(util::runlevel level) {
 		}
 
 		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-			if(unit::managed_units[i].runlevel < level) {
+			if(level == OFF || level == REBOOT || unit::managed_units[i].runlevel < level) {
 				std::cout << "Sending SIGKILL to " << unit::managed_units[i].pid << std::endl;
 				kill(unit::managed_units[i].pid, SIGKILL);
 			}
