@@ -43,7 +43,7 @@ void startup_scripts() {
 }
 
 
-void launch_programs() {
+void launch_programs(util::runlevel level) {
 	std::cout << "Launching programs..." << std::endl;
 
 	unit::init();
@@ -61,7 +61,7 @@ void launch_programs() {
 			strcat(file_name, file.name);
 			if (strcmp(file.extension, "unit") == 0) {
 				std::cout << "Runnning " << file_name << " as an unit." << std::endl;
-				unit::run_unit(file_name);
+				unit::run_unit(file_name, level);
 			} else if (strcmp(file.extension, "disabled") == 0) {
 				std::cout << "Ignoring " << file_name << "..." << std::endl;
 				// It's disabled, ignore it
