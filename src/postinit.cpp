@@ -27,7 +27,7 @@ void post_init(bool debug) {
 								if (debug)
 									std::cout << "Removed unit number " << i << std::endl;
 	
-								unit::run_unit(unit_name);
+								unit::run_unit(unit_name, util::curr_runlevel);
 								if (debug)
 									std::cout << "Launched unit successfully!" << std::endl;
 							} else {
