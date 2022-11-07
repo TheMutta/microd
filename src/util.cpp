@@ -133,11 +133,11 @@ void change_state(change_action action) {
 		default:
 			break;
 		case sys_reboot:
-			change_runlevel(OFF);
+			change_runlevel(REBOOT);
 			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_RESTART, 0);
 			break;
 		case sys_poweroff:
-			change_runlevel(REBOOT);
+			change_runlevel(OFF);
 			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_POWER_OFF, 0);
 			break;
 		case sys_halt:
