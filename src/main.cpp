@@ -25,7 +25,7 @@
 
 #include "rdinit.h"
 #include "postinit.h"
-#include "mount_special.h"
+#include "mount.h"
 #include "util.h"
 #include "rootutils.h"
 
@@ -73,9 +73,9 @@ int main(int argc, char** argv) {
 
 	util::ok("Started root /init");
 
-	mount_specialfs();
+        mounting::mount_specialfs();
 
-	root::remount_root_rw(init_arguments.rootdrv, init_arguments.rootfstype, MS_REMOUNT | MS_NOATIME);
+	mounting::remount_root_rw(MS_REMOUNT | MS_NOATIME);
 
 	util::ok("Finished mounting");
 

@@ -2,28 +2,6 @@
 
 namespace root {
 
-void remount_root_rw(char* rootfs, char* rootfs_type, unsigned long rootfs_mount_flags) {
-	std::cout << "Remounting root as read-write." << std::endl;
-	if (mount(rootfs, "/", rootfs_type, rootfs_mount_flags, "") !=0 ) {
-		util::panic("Failed to remount rootfs. Cannot proceed.");
-	} else {
-		util::ok("Rootfs has been remounted");
-	}
-
-	return;
-}
-
-void mount_drive(char* drv, char* fstype, char* destdir, unsigned long flags) {
-	std::cout << "Mounting " << drv << " in " << destdir << "..." << std::endl;
-	if (mount(drv, destdir, fstype, flags, "") !=0 ) {
-		util::warning("Failed to mount! The system may not behave correctly.");
-	} else {
-		util::ok("Drive mounted");
-	}
-
-	return;
-}
-
 void startup_scripts() {
 	std::cout << "Running startup scripts..." << std::endl;
 

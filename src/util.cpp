@@ -1,6 +1,7 @@
 #include "util.h"
 
 #include "rootutils.h"
+#include "mount.h"
 
 namespace util {
 
@@ -98,7 +99,9 @@ void change_runlevel(runlevel level) {
 	std::cout << "Switched to runlevel " << curr_runlevel << std::endl;
 	switch(curr_runlevel) {
 		case OFF:
-			// Die
+                        sync();
+                        mounting::remount_root_ro();
+                        mounting::unmount_specialfs();
 			break;
 		case SINGLE:
 			debug_shell();
@@ -120,7 +123,9 @@ void change_runlevel(runlevel level) {
 			root::launch_programs(curr_runlevel);
 			break;
 		case REBOOT:
-			// Die
+                        sync();
+                        mounting::remount_root_ro();
+                        mounting::unmount_specialfs();
 			break;
 
 	}

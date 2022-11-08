@@ -3,7 +3,7 @@
 #include <sys/syscall.h>
 #include <unistd.h>
 
-#include "mount_special.h"
+#include "mount.h"
 #include "util.h"
 
 void initrd_init(util::arguments init_arguments);
