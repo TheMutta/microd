@@ -8,12 +8,13 @@
 #include <cstring>
 
 #include "util.h"
+#include "state.h"
 
 namespace unit {
 
 struct Unit {
 	std::string file;
-	util::runlevel runlevel;
+	state::runlevel runlevel;
 	pid_t pid;
 	int status;
 	bool restart = false;
@@ -23,7 +24,7 @@ struct Unit {
 
 extern std::vector<Unit> managed_units;
 
-int run_unit(std::string unit_file, util::runlevel level);
+int run_unit(std::string unit_file, state::runlevel level);
+void kill_units(state::runlevel level);
 void init();
-
 }

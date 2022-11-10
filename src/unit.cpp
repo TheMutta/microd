@@ -24,7 +24,7 @@ void init() {
 }
 
 
-int run_unit(std::string unit_file, util::runlevel level) {
+int run_unit(std::string unit_file, state::runlevel level) {
 	std::ifstream file;
 	std::string line,
 		    action,
@@ -69,16 +69,16 @@ int run_unit(std::string unit_file, util::runlevel level) {
 			void;
 			// go on
 		else {
-			if (runlevel == "2" && level >= util::MULTI)
+			if (runlevel == "2" && level >= state::MULTI)
 				void;
 				// go on
-			else if (runlevel == "3" && level >= util::MULTINET)
+			else if (runlevel == "3" && level >= state::MULTINET)
 				void;
 				// go on
-			else if (runlevel == "4" && level >= util::MULTIP)
+			else if (runlevel == "4" && level >= state::MULTIP)
 				void;
 				// go on
-			else if (runlevel == "5" && level >= util::FULL)
+			else if (runlevel == "5" && level >= state::FULL)
 				void;
 				// go on
 			else {
@@ -128,4 +128,34 @@ int run_unit(std::string unit_file, util::runlevel level) {
 		return -1;
 	}
 }
+
+void kill_units(state::runlevel level) {
+	if (unit::managed_units.size() > 0) {
+		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
+			if(level == state::OFF || level == state::REBOOT || unit::managed_units[i].runlevel < level) {
+				std::cout << "Sending SIGTERM to " << unit::managed_units[i].pid << std::endl;
+				kill(unit::managed_units[i].pid, SIGTERM);
+			}
+		}
+
+		sleep(2);
+
+		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
+			if(waitpid(unit::managed_units[i].pid, &unit::managed_units[i].status, WNOHANG) != 0) {
+				if (WIFEXITED(unit::managed_units[i].status)) {
+					unit::managed_units.erase(unit::managed_units.begin() + i);
+				}
+			}
+		}
+
+		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
+			if(level == state::OFF || level == state::REBOOT || unit::managed_units[i].runlevel < level) {
+				std::cout << "Sending SIGKILL to " << unit::managed_units[i].pid << std::endl;
+				kill(unit::managed_units[i].pid, SIGKILL);
+			}
+		}
+	}
+}
+
+
 }

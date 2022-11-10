@@ -1,11 +1,6 @@
 #include "util.h"
 
-#include "rootutils.h"
-#include "mount.h"
-
 namespace util {
-
-runlevel curr_runlevel;
 
 void exec(const std::vector<std::string> &argv) {
 	if (argv.size() == 0) { 
@@ -38,7 +33,7 @@ void ok(std::string message) {
 void panic(std::string message) {
 	std::cout << "[\033[0;31mPANIC\033[0m] " << message << std::endl;
 	debug_shell();
-	change_state(sys_halt);
+        state::change_state(state::sys_halt);
 }
 
 void warning(std::string message) {
@@ -61,116 +56,7 @@ void debug_shell() {
 	} else {
 		waitpid(shell_pid, 0, 0);
 		ok("Exited debug shell");
-		change_state(sys_runlevel_2);
-	}
-}
-
-void kill_units(util::runlevel level) {
-	if (unit::managed_units.size() > 0) {
-		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-			if(level == OFF || level == REBOOT || unit::managed_units[i].runlevel < level) {
-				std::cout << "Sending SIGTERM to " << unit::managed_units[i].pid << std::endl;
-				kill(unit::managed_units[i].pid, SIGTERM);
-			}
-		}
-
-		sleep(2);
-
-		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-			if(waitpid(unit::managed_units[i].pid, &unit::managed_units[i].status, WNOHANG) != 0) {
-				if (WIFEXITED(unit::managed_units[i].status)) {
-					unit::managed_units.erase(unit::managed_units.begin() + i);
-				}
-			}
-		}
-
-		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-			if(level == OFF || level == REBOOT || unit::managed_units[i].runlevel < level) {
-				std::cout << "Sending SIGKILL to " << unit::managed_units[i].pid << std::endl;
-				kill(unit::managed_units[i].pid, SIGKILL);
-			}
-		}
-	}
-}
-
-void change_runlevel(runlevel level) {
-	curr_runlevel = level;
-	kill_units(curr_runlevel);
-	std::cout << "Switched to runlevel " << curr_runlevel << std::endl;
-	switch(curr_runlevel) {
-		case OFF:
-                        sync();
-                        mounting::remount_root_ro();
-                        mounting::unmount_specialfs();
-			break;
-		case SINGLE:
-			debug_shell();
-			break;
-		case MULTI:
-			root::startup_scripts();
-			root::launch_programs(curr_runlevel);
-			break;
-		case MULTINET:
-			root::startup_scripts();
-			root::launch_programs(curr_runlevel);
-			break;
-		case MULTIP:
-			root::startup_scripts();
-			root::launch_programs(curr_runlevel);
-			break;
-		case FULL:
-			root::startup_scripts();
-			root::launch_programs(curr_runlevel);
-			break;
-		case REBOOT:
-                        sync();
-                        mounting::remount_root_ro();
-                        mounting::unmount_specialfs();
-			break;
-
-	}
-}
-
-void change_state(change_action action) {
-	sync();
-	
-	switch (action) {
-		default:
-			break;
-		case sys_reboot:
-			change_runlevel(REBOOT);
-			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_RESTART, 0);
-			break;
-		case sys_poweroff:
-			change_runlevel(OFF);
-			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_POWER_OFF, 0);
-			break;
-		case sys_halt:
-			change_runlevel(OFF);
-			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_HALT, 0);
-			break;
-		case sys_suspend:
-			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_SW_SUSPEND, 0);
-			break;
-		case sys_kexec:
-			change_runlevel(OFF);
-			syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_KEXEC, 0);
-			break;
-		case sys_runlevel_1:
-			change_runlevel(SINGLE);
-			break;
-		case sys_runlevel_2:
-			change_runlevel(MULTI);
-			break;
-		case sys_runlevel_3:
-			change_runlevel(MULTINET);
-			break;
-		case sys_runlevel_4:
-			change_runlevel(MULTIP);
-			break;
-		case sys_runlevel_5:
-			change_runlevel(FULL);
-			break;
+                state::change_state(state::sys_runlevel_2);
 	}
 }
 

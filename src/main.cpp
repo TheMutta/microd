@@ -35,7 +35,7 @@ const char* date = "2022-2022";
 
 util::arguments init_arguments;
 
-util::runlevel boot_runlevel;
+state::runlevel boot_runlevel;
 
 void sig_handler(int signum);
 
@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
 	init_arguments.is_in_root = false;
 	init_arguments.rootdrv = "";
 	init_arguments.rootfstype = "";
-	boot_runlevel = util::FULL;
+	boot_runlevel = state::FULL;
 
 	parse_arguments(argc, argv);
 		
@@ -87,26 +87,26 @@ int main(int argc, char** argv) {
 	          << "located in the program's repository, for more information." << std::endl;
 
 	switch(boot_runlevel) {
-		case util::OFF:
-			util::change_state(util::sys_halt);
+		case state::OFF:
+			state::change_state(state::sys_halt);
 			break;
-		case util::SINGLE:
-			util::change_state(util::sys_runlevel_1);
+		case state::SINGLE:
+			state::change_state(state::sys_runlevel_1);
 			break;
-		case util::MULTI:
-			util::change_state(util::sys_runlevel_2);
+		case state::MULTI:
+			state::change_state(state::sys_runlevel_2);
 			break;
-		case util::MULTINET:		
-			util::change_state(util::sys_runlevel_3);
+		case state::MULTINET:		
+			state::change_state(state::sys_runlevel_3);
 			break;
-		case util::MULTIP:
-			util::change_state(util::sys_runlevel_4);
+		case state::MULTIP:
+			state::change_state(state::sys_runlevel_4);
 			break;
-		case util::FULL:
-			util::change_state(util::sys_runlevel_5);
+		case state::FULL:
+			state::change_state(state::sys_runlevel_5);
 			break;
-		case util::REBOOT:
-			util::change_state(util::sys_reboot);
+		case state::REBOOT:
+			state::change_state(state::sys_reboot);
 			break;
 	}
 
@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
 
 	util::panic("Something is wrong. We have passed the post_init() function.");
 
-	util::change_state(util::sys_halt);
+	state::change_state(state::sys_halt);
 }
 
 inline void parse_arguments(int argc, char** argv) {
@@ -124,32 +124,32 @@ inline void parse_arguments(int argc, char** argv) {
 		else if(strcmp(argv[i], "init_debug") == 0)
 			init_arguments.is_debug = true;
 		else if(strcmp(argv[i], "0") == 0)
-			boot_runlevel = util::OFF;
+			boot_runlevel = state::OFF;
 		else if(strcmp(argv[i], "1") == 0)
-			boot_runlevel = util::SINGLE;
+			boot_runlevel = state::SINGLE;
 		else if(strcmp(argv[i], "2") == 0)
-			boot_runlevel = util::MULTI;
+			boot_runlevel = state::MULTI;
 		else if(strcmp(argv[i], "3") == 0)
-			boot_runlevel = util::MULTINET;
+			boot_runlevel = state::MULTINET;
 		else if(strcmp(argv[i], "4") == 0)
-			boot_runlevel = util::MULTIP;
+			boot_runlevel = state::MULTIP;
 		else if(strcmp(argv[i], "5") == 0)
-			boot_runlevel = util::FULL;
+			boot_runlevel = state::FULL;
 		else if(strcmp(argv[i], "6") == 0)
-			boot_runlevel = util::REBOOT;
+			boot_runlevel = state::REBOOT;
 	}
 }
 
 void sig_handler(int signum) {
 	switch(signum) {
 		case SIGTERM:
-			util::change_state(util::sys_reboot);
+			state::change_state(state::sys_reboot);
 			break;
 		case SIGUSR1:
-			util::change_state(util::sys_halt);
+			state::change_state(state::sys_halt);
 			break;
 		case SIGUSR2:
-			util::change_state(util::sys_poweroff);
+			state::change_state(state::sys_poweroff);
 			break;
 		default:
 			// Signal not recognized

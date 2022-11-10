@@ -11,5 +11,5 @@
 
 namespace root {
 	void startup_scripts();
-	void launch_programs(util::runlevel level); 
+	void launch_programs(state::runlevel level); 
 }
