@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
 
         /* Create local socket. */
 
-        data_socket = socket(AF_UNIX, SOCK_SEQPACKET, 0);
+        data_socket = socket(AF_UNIX, SOCK_STREAM, 0);
         if (data_socket == -1) {
                 perror("socket");
                 exit(EXIT_FAILURE);
@@ -48,7 +48,9 @@ int main(int argc, char** argv) {
         /* Send arguments. */
         
         if (argc > 1) {
-                ret = write(data_socket, argv[1], strlen(argv[1]) + 1);
+                strcpy(buffer, argv[1]);
+                buffer[sizeof(buffer) - 1] = 0;
+                ret = write(data_socket, buffer, strlen(buffer) + 1);
                 if (ret == -1) {
                         perror("write");
                         exit(EXIT_FAILURE);

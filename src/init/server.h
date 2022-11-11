@@ -7,7 +7,7 @@
 #include <iostream>
 
 namespace server {
-        extern char* socket_name;
+        extern const char* socket_name;
         
         void init_socket();
         void run_socket();
