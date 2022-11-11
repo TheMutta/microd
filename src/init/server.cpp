@@ -51,6 +51,7 @@ void run_socket() {
 	/* This is the main loop for handling connections. */
        	/* Wait for incoming connection. */
 
+
        	data_socket = accept(server_socket, NULL, NULL);
        	if (data_socket == -1) {
 		perror("accept");
@@ -62,7 +63,7 @@ void run_socket() {
         }
         /* Send buffer. */
 
-        std::cout << buffer;
+        std::cout << "Initctl says: " << buffer << std::endl;
         ret = write(data_socket, buffer, sizeof(buffer));
         if (ret == -1) {
                 perror("write");
