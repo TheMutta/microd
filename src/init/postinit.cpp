@@ -2,7 +2,8 @@
 
 static bool is_debug;
 
-static void control_units() {
+static void control_units(int signal) {
+        (void)signal;
         for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
 			if(waitpid(unit::managed_units[i].pid, &unit::managed_units[i].status, WNOHANG) != 0) {
 				std::cout << "Unit " << unit::managed_units[i].file << " PID " <<  unit::managed_units[i].pid << " has status " << unit::managed_units[i].status << std::endl;
@@ -45,6 +46,8 @@ void post_init(bool debug) {
 		  << "Unless debug mode is active, only critical messages will be sent." << std::endl;
 
 
+        signal(SIGCHLD, control_units);
+
 	if (is_debug)
 		util::ok("Housekeeping started.");
 
@@ -53,9 +56,7 @@ void post_init(bool debug) {
         server::init_socket();
 
         while (true) {
-	        control_units();
                 server::run_socket();
-
 
 		sleep(1);
 	}
