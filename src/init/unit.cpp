@@ -65,11 +65,10 @@ int run_unit(std::string unit_file, state::runlevel level) {
 
 		file.close();
 
-		if (runlevel == "all")
-			void;
-			// go on
-		else {
-			if (runlevel == "2" && level >= state::MULTI)
+                        if (runlevel == "1" && level == state::SINGLE)
+                                void;
+                                // go on
+                        else if (runlevel == "2" && level >= state::MULTI)
 				void;
 				// go on
 			else if (runlevel == "3" && level >= state::MULTINET)
@@ -85,7 +84,6 @@ int run_unit(std::string unit_file, state::runlevel level) {
 				std::cout << "Unit " << unit_file << " runs in runlevel " << runlevel << " or higher. Not starting it.\n";
 				return -1;
 			}
-		}
 		
 		std::cout << unit_file << " says: " << message_text << std::endl;
 
@@ -130,29 +128,17 @@ int run_unit(std::string unit_file, state::runlevel level) {
 }
 
 void kill_units(state::runlevel level) {
-	if (unit::managed_units.size() > 0) {
-		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-			if(level == state::OFF || level == state::REBOOT || unit::managed_units[i].runlevel < level) {
-				std::cout << "Sending SIGTERM to " << unit::managed_units[i].pid << std::endl;
-				kill(unit::managed_units[i].pid, SIGTERM);
-			}
+	for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
+		if(level == state::OFF || level == state::REBOOT || unit::managed_units[i].runlevel < level) {
+			std::cout << "Sending SIGTERM to " << unit::managed_units[i].pid << std::endl;
+			kill(unit::managed_units[i].pid, SIGTERM);
 		}
+	}
 
-		sleep(2);
-
-		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-			if(waitpid(unit::managed_units[i].pid, &unit::managed_units[i].status, WNOHANG) != 0) {
-				if (WIFEXITED(unit::managed_units[i].status)) {
-					unit::managed_units.erase(unit::managed_units.begin() + i);
-				}
-			}
-		}
-
-		for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-			if(level == state::OFF || level == state::REBOOT || unit::managed_units[i].runlevel < level) {
-				std::cout << "Sending SIGKILL to " << unit::managed_units[i].pid << std::endl;
-				kill(unit::managed_units[i].pid, SIGKILL);
-			}
+	for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
+		if(level == state::OFF || level == state::REBOOT || unit::managed_units[i].runlevel < level) {
+			std::cout << "Sending SIGKILL to " << unit::managed_units[i].pid << std::endl;
+			kill(unit::managed_units[i].pid, SIGKILL);
 		}
 	}
 }
