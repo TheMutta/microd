@@ -28,6 +28,8 @@
 #include "mount.h"
 #include "util.h"
 #include "rootutils.h"
+#include "server.h"
+#include "unit.h"
 
 const char* version = "0.2.0-alpha";
 const char* author = "Mutta Filippo";
@@ -37,7 +39,7 @@ util::arguments init_arguments;
 
 state::runlevel boot_runlevel;
 
-void sig_handler(int signum);
+void sig_handler(int sig, siginfo_t *info, void *ucontext);
 
 void parse_arguments(int argc, char** argv);
 
@@ -48,9 +50,16 @@ int main(int argc, char** argv) {
 		exit(0);
 	}
 
-	signal(SIGTERM, sig_handler);
-	signal(SIGUSR1, sig_handler);
-	signal(SIGUSR2, sig_handler);
+        struct sigaction new_action;
+        new_action.sa_sigaction = sig_handler;
+        sigemptyset(&new_action.sa_mask);
+        new_action.sa_flags = SA_SIGINFO;
+
+        sigaction(SIGTERM, &new_action, NULL);
+        sigaction(SIGUSR1, &new_action, NULL);
+        sigaction(SIGUSR2, &new_action, NULL);
+        sigaction(SIGCHLD, &new_action, NULL);
+        sigaction(SIGCONT, &new_action, NULL);
 
 	init_arguments.is_debug = false;
 	init_arguments.is_in_root = false;
@@ -140,8 +149,8 @@ inline void parse_arguments(int argc, char** argv) {
 	}
 }
 
-void sig_handler(int signum) {
-	switch(signum) {
+void sig_handler(int sig, siginfo_t *info, void *ucontext) {
+	switch(sig) {
 		case SIGTERM:
 			state::change_state(state::sys_reboot);
 			break;
@@ -151,9 +160,30 @@ void sig_handler(int signum) {
 		case SIGUSR2:
 			state::change_state(state::sys_poweroff);
 			break;
+                case SIGCONT:
+                        server::run_socket();
+                        break;
+                case SIGCHLD:
+                        for(int i = 0; i < unit::managed_units.size(); i++)  {
+                                if(unit::managed_units[i].pid == info->si_pid) {
+                                        if(state::curr_runlevel != state::OFF &&
+                                           state::curr_runlevel != state::REBOOT &&
+                                           unit::managed_units[i].restart &&
+                                           unit::managed_units[i].restart_if_stopped &&
+                                           info->si_errno == 0) {
+					        std::string unit_name;
+                                                unit_name = unit::managed_units[i].file;
+        				        unit::managed_units.erase(unit::managed_units.begin() + i);
+		        	                unit::run_unit(unit_name, state::curr_runlevel);
+                                        } else {
+                                                unit::managed_units.erase(unit::managed_units.begin() + i);
+                                        }
+                                }
+                        }
+                        break;
 		default:
 			// Signal not recognized
-			std::cout << "Recieved unrecognized signal: " << signum << std::endl;
+			std::cout << "Recieved unrecognized signal: " << sig << std::endl;
 			break;
-	}
+        }
 }
