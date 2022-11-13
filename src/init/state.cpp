@@ -5,7 +5,7 @@
 
 namespace state {
 
-runlevel curr_runlevel;
+volatile runlevel curr_runlevel;
 
 void change_runlevel(runlevel level) {
 	curr_runlevel = level;
@@ -18,7 +18,8 @@ void change_runlevel(runlevel level) {
                         mounting::unmount_specialfs();
 			break;
 		case SINGLE:
-                        util::debug_shell();
+                        std::cout << "Entering mainenance mode." << std::endl;
+			root::launch_programs(curr_runlevel);
 			break;
 		case MULTI:
 			root::startup_scripts();

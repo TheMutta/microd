@@ -24,7 +24,7 @@ namespace state {
 			     sys_runlevel_5,
 	};
 
-	extern runlevel curr_runlevel;
+	extern volatile runlevel curr_runlevel;
 
         void change_runlevel(runlevel level);
 	void change_state(change_action action);
