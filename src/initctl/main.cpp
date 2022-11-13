@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
+#include <signal.h>
 
 char* socket_name = "/var/run/init.socket\0";
 unsigned short socket_buffer_size = 1024;
@@ -57,12 +58,7 @@ int main(int argc, char** argv) {
                 }
         }
 
-        /* Request result. */
-
-        if (ret == -1) {
-                perror("write");
-                exit(EXIT_FAILURE);
-        }
+        kill(1, SIGCONT);
 
         /* Receive result. */
 
