@@ -24,7 +24,7 @@ struct Unit {
 
 extern std::vector<Unit> managed_units;
 
-int run_unit(std::string unit_file, state::runlevel level);
+int run_unit(std::string unit_file, state::runlevel level, unsigned launch_runlevel);
 void kill_units(state::runlevel level);
 void init();
 }

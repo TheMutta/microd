@@ -5,7 +5,7 @@ namespace unit {
 
 std::vector<Unit> managed_units;
 
-enum valid_actions { action_start,
+enum valid_actions { /*action_start,*/
 		     action_executable,
 		     action_message,
 		     action_requires,
@@ -16,7 +16,7 @@ std::map<std::string, valid_actions> mapped_actions;
 
 
 void init() {
-	mapped_actions["start"] = action_start;
+	/*mapped_actions["start"] = action_start;*/
 	mapped_actions["exec"] = action_executable;
 	mapped_actions["mesg"] = action_message;
 	mapped_actions["before"] = action_requires;
@@ -24,26 +24,28 @@ void init() {
 }
 
 
-int run_unit(std::string unit_file, state::runlevel level) {
+int run_unit(std::string unit_file, state::runlevel level, unsigned launch_runlevel) {
 	std::ifstream file;
 	std::string line,
 		    action,
-		    runlevel,
+		    /*runlevel,*/
 		    executable_cmd,
 		    message_text,
 		    required_unit,
 		    restart;
 
-	file.open(unit_file.c_str());
+	file.open(unit_file);
+
+        std::cout << "Running unit " << unit_file << " as it is runnable." << std::endl;
 
 	if (file.is_open()) {
 		while (std::getline(file, line)) {
 			std::stringstream curr_line(line);
 			std::getline(curr_line, action, ' ' );
 			switch (mapped_actions[action]) {
-				case action_start:
+				/*case action_start:
 					std::getline(curr_line, runlevel);
-					break;
+					break;*/
 				case action_executable:
 					std::getline(curr_line, executable_cmd);
 					break;
@@ -65,6 +67,12 @@ int run_unit(std::string unit_file, state::runlevel level) {
 
 		file.close();
 
+
+                if (launch_runlevel > level) {
+			std::cout << "Unit " << unit_file << " runs in runlevel " << launch_runlevel << " or higher. Not starting it.\n";
+			return -1;
+                }
+/*
                         if (runlevel == "1" && level == state::SINGLE)
                                 void;
                                 // go on
@@ -84,7 +92,7 @@ int run_unit(std::string unit_file, state::runlevel level) {
 				std::cout << "Unit " << unit_file << " runs in runlevel " << runlevel << " or higher. Not starting it.\n";
 				return -1;
 			}
-		
+		*/
 		std::cout << unit_file << " says: " << message_text << std::endl;
 
 		std::stringstream parse_exec(executable_cmd);

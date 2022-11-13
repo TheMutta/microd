@@ -1,5 +1,7 @@
 #include "server.h"
 
+#include "state.h"
+
 namespace server {
 
 const char* socket_name = "/var/run/init.socket\0";
@@ -64,11 +66,10 @@ void run_socket() {
         
         std::cout << "Initctl sends a message...";
 
-        if (strcmp(buffer, "hello") == 0)
-                std::cout << "Initctl says hello to you!" << std::endl;
-        else if (strcmp(buffer, "canyoureadthis") == 0) 
+        if (strcmp(buffer, "runlevel") == 0) {
                 std::cout << "Initctl says hello to the world!" << std::endl;
-        else
+                state::change_state(state::sys_runlevel_1);
+        } else
                 std::cout << "Initctl said something unknown!" << std::endl;
 
         /* Send buffer. */

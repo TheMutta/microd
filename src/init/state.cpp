@@ -19,22 +19,18 @@ void change_runlevel(runlevel level) {
 			break;
 		case SINGLE:
                         std::cout << "Entering mainenance mode." << std::endl;
-			root::launch_programs(curr_runlevel);
+                        while (true);
 			break;
 		case MULTI:
-			root::startup_scripts();
 			root::launch_programs(curr_runlevel);
 			break;
 		case MULTINET:
-			root::startup_scripts();
 			root::launch_programs(curr_runlevel);
 			break;
 		case MULTIP:
-			root::startup_scripts();
 			root::launch_programs(curr_runlevel);
 			break;
 		case FULL:
-			root::startup_scripts();
 			root::launch_programs(curr_runlevel);
 			break;
 		case REBOOT:

@@ -174,7 +174,7 @@ void sig_handler(int sig, siginfo_t *info, void *ucontext) {
 					        std::string unit_name;
                                                 unit_name = unit::managed_units[i].file;
         				        unit::managed_units.erase(unit::managed_units.begin() + i);
-		        	                unit::run_unit(unit_name, state::curr_runlevel);
+		        	                unit::run_unit(unit_name, state::curr_runlevel, state::curr_runlevel);
                                         } else {
                                                 unit::managed_units.erase(unit::managed_units.begin() + i);
                                         }

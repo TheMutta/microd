@@ -2,43 +2,49 @@
 
 namespace root {
 
-void startup_scripts() {
-	std::cout << "Running startup scripts..." << std::endl;
-
-	pid_t pid=fork();
-
-	if (pid==0) {
-		static char *argv[]={"busybox", "sh", "/etc/inittab", NULL};
-		static char *env[]={"PATH=/bin:/sbin", NULL};
-		execve("/bin/busybox", argv, env);
-		perror("execve");
-		exit(1);
-	} else {
-		waitpid(pid,0,0);
-	}
-
-	return;
-}
-
-
 void launch_programs(state::runlevel level) {
 	std::cout << "Launching programs..." << std::endl;
 
 	unit::init();
 
-	tinydir_dir dir;
-	tinydir_open(&dir, "/etc/autostart");
+        std::ifstream inittab_file;
+        inittab_file.open("/etc/inittab");
 
+        /*tinydir_dir dir;
+	tinydir_open(&dir, "/etc/init");*/
+
+
+        if(inittab_file.is_open()) {
+                std::string line, runlevel, instruction, file_name;
+                int launch_runlevel = 1;
+                while(std::getline(inittab_file, line)) {
+              		std::stringstream curr_line(line);
+                	std::getline(curr_line, instruction, ' ' );
+                        if (instruction == "runlevel") {
+                	        std::getline(curr_line, runlevel, ' ' );
+                                launch_runlevel = atoi(runlevel.c_str());
+                        } else {
+                                file_name = instruction;
+                                file_name = "/etc/init/" + file_name + ".unit";
+				std::cout << "Runnning " << file_name << " as an unit." << std::endl;
+                                unit::run_unit(file_name, level, launch_runlevel);
+                        }
+                        
+                }
+        }
+
+        inittab_file.close();
+/*
 	while (dir.has_next) {
 		tinydir_file file;
-		tinydir_readfile(&dir, &file);
+        	tinydir_readfile(&dir, &file);
+
 
 		if (!file.is_dir) {
 			char file_name[512] = {0};
 			strcat(file_name, "/etc/autostart/");
 			strcat(file_name, file.name);
 			if (strcmp(file.extension, "unit") == 0) {
-				std::cout << "Runnning " << file_name << " as an unit." << std::endl;
 				unit::run_unit(file_name, level);
 			} else if (strcmp(file.extension, "disabled") == 0) {
 				std::cout << "Ignoring " << file_name << "..." << std::endl;
@@ -68,6 +74,7 @@ void launch_programs(state::runlevel level) {
 	}
 
 	tinydir_close(&dir);	
+*/
 }
 
 }
