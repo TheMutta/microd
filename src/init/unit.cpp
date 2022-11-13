@@ -122,8 +122,8 @@ int run_unit(std::string unit_file, state::runlevel level, unsigned launch_runle
 
 		if (restart == "always") {
 			managed_units[managed_units.size() - 1].restart = true;
-			managed_units[managed_units.size() - 1].restart_if_stopped = true;
-		} else if (restart == "unless stopped") {
+			managed_units[managed_units.size() - 1].restart_unless_stopped = true;
+		} else if (restart == "nostop") {
 			managed_units[managed_units.size() - 1].restart = true;
 		} else {
 			// Is either never or not valid

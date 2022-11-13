@@ -30,10 +30,7 @@
 #include "rootutils.h"
 #include "server.h"
 #include "unit.h"
-
-const char* version = "0.2.0-alpha";
-const char* author = "Mutta Filippo";
-const char* date = "2022-2022";
+#include "../config.h"
 
 util::arguments init_arguments;
 
@@ -168,13 +165,16 @@ void sig_handler(int sig, siginfo_t *info, void *ucontext) {
                                 if(unit::managed_units[i].pid == info->si_pid) {
                                         if(state::curr_runlevel != state::OFF &&
                                            state::curr_runlevel != state::REBOOT &&
-                                           unit::managed_units[i].restart &&
-                                           unit::managed_units[i].restart_if_stopped &&
                                            info->si_errno == 0) {
-					        std::string unit_name;
+                                                std::string unit_name;
                                                 unit_name = unit::managed_units[i].file;
-        				        unit::managed_units.erase(unit::managed_units.begin() + i);
-		        	                unit::run_unit(unit_name, state::curr_runlevel, state::curr_runlevel);
+        	        			unit::managed_units.erase(unit::managed_units.begin() + i);
+
+                                                if (unit::managed_units[i].restart ||
+                                                    (unit::managed_units[i].restart_unless_stopped &&
+                                                     !unit::managed_units[i].is_stopped)) {
+        					         unit::run_unit(unit_name, state::curr_runlevel, 0);
+                                                }
                                         } else {
                                                 unit::managed_units.erase(unit::managed_units.begin() + i);
                                         }

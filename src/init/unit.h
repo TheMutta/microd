@@ -16,9 +16,9 @@ struct Unit {
 	std::string file;
 	state::runlevel runlevel;
 	pid_t pid;
-	int status;
+        int status;
 	bool restart = false;
-	bool restart_if_stopped = false;
+	bool restart_unless_stopped = false;
 	bool is_stopped = false; // Unused
 };
 
