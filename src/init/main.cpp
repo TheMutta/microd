@@ -173,9 +173,10 @@ void sig_handler(int sig, siginfo_t *info, void *ucontext) {
                                                 if (unit::managed_units[i].restart ||
                                                     (unit::managed_units[i].restart_unless_stopped &&
                                                      !unit::managed_units[i].is_stopped)) {
-        					         unit::run_unit(unit_name, state::curr_runlevel, 0);
+        					         unit::run_unit(unit_name, state::curr_runlevel, unit::managed_units[i].runlevel);
                                                 }
                                         } else {
+                                                std::cout << "Unit " << info->si_pid << " failed." << std::endl;
                                                 unit::managed_units.erase(unit::managed_units.begin() + i);
                                         }
                                 }

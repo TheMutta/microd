@@ -5,7 +5,7 @@ namespace unit {
 
 std::vector<Unit> managed_units;
 
-enum valid_actions { /*action_start,*/
+enum valid_actions {
 		     action_executable,
 		     action_message,
 		     action_requires,
@@ -16,7 +16,6 @@ std::map<std::string, valid_actions> mapped_actions;
 
 
 void init() {
-	/*mapped_actions["start"] = action_start;*/
 	mapped_actions["exec"] = action_executable;
 	mapped_actions["mesg"] = action_message;
 	mapped_actions["before"] = action_requires;
@@ -24,11 +23,10 @@ void init() {
 }
 
 
-int run_unit(std::string unit_file, state::runlevel level, unsigned launch_runlevel) {
+int run_unit(std::string unit_file, state::runlevel level, state::runlevel launch_runlevel) {
 	std::ifstream file;
 	std::string line,
 		    action,
-		    /*runlevel,*/
 		    executable_cmd,
 		    message_text,
 		    required_unit,
@@ -36,16 +34,11 @@ int run_unit(std::string unit_file, state::runlevel level, unsigned launch_runle
 
 	file.open(unit_file);
 
-        std::cout << "Running unit " << unit_file << " as it is runnable." << std::endl;
-
 	if (file.is_open()) {
 		while (std::getline(file, line)) {
 			std::stringstream curr_line(line);
 			std::getline(curr_line, action, ' ' );
 			switch (mapped_actions[action]) {
-				/*case action_start:
-					std::getline(curr_line, runlevel);
-					break;*/
 				case action_executable:
 					std::getline(curr_line, executable_cmd);
 					break;
@@ -67,32 +60,10 @@ int run_unit(std::string unit_file, state::runlevel level, unsigned launch_runle
 
 		file.close();
 
-
-                if (launch_runlevel > level) {
-			std::cout << "Unit " << unit_file << " runs in runlevel " << launch_runlevel << " or higher. Not starting it.\n";
+                if (launch_runlevel > level || launch_runlevel == state::OFF) {
+			std::cout << "Unit " << unit_file << " runs in runlevel " << launch_runlevel << " or higher. Not starting it." << std::endl;
 			return -1;
                 }
-/*
-                        if (runlevel == "1" && level == state::SINGLE)
-                                void;
-                                // go on
-                        else if (runlevel == "2" && level >= state::MULTI)
-				void;
-				// go on
-			else if (runlevel == "3" && level >= state::MULTINET)
-				void;
-				// go on
-			else if (runlevel == "4" && level >= state::MULTIP)
-				void;
-				// go on
-			else if (runlevel == "5" && level >= state::FULL)
-				void;
-				// go on
-			else {
-				std::cout << "Unit " << unit_file << " runs in runlevel " << runlevel << " or higher. Not starting it.\n";
-				return -1;
-			}
-		*/
 		std::cout << unit_file << " says: " << message_text << std::endl;
 
 		std::stringstream parse_exec(executable_cmd);
@@ -119,6 +90,7 @@ int run_unit(std::string unit_file, state::runlevel level, unsigned launch_runle
 		managed_units.push_back(Unit());
 		managed_units[managed_units.size() - 1].file = unit_file;
 		managed_units[managed_units.size() - 1].pid = daemon;
+		managed_units[managed_units.size() - 1].runlevel = launch_runlevel;
 
 		if (restart == "always") {
 			managed_units[managed_units.size() - 1].restart = true;

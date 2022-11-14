@@ -1,5 +1,4 @@
 #include <iostream>
-
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,11 +8,13 @@
 #include <unistd.h>
 #include <signal.h>
 
-char* socket_name = "/var/run/init.socket\0";
+#include "../config.h"
+
+char* socket_name = "/var/run/init.socket";
 unsigned short socket_buffer_size = 1024;
 
 int main(int argc, char** argv) {
-        std::cout << "Hello world from initctl!" << std::endl;
+        std::cout << "Hello world from initctl " << version << std::endl;
         struct sockaddr_un addr;
         int ret;
         int data_socket;
