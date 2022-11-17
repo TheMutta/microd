@@ -1,7 +1,8 @@
 #pragma once
 #include <unistd.h>
 #include <sys/mount.h>
-
+#include <mntent.h>
+#include <iostream>
 #include "util.h"
 
 namespace mounting {
@@ -15,13 +16,11 @@ namespace mounting {
         void mount_drive(const char* drv,
                  const char* destdir,
                  const char* fstype,
-                 unsigned long flags,
-                 std::string warning_message,
-                 std::string ok_message);
+                 unsigned long flags);
 	
-        void unmount_drive(const char* destdir,
-                 std::string warning_message,
-                 std::string ok_message);
+        void unmount_drive(const char* destdir);
 
 
+        void mount_fstab();
+        void unmount_fstab();
 }
