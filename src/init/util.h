@@ -24,8 +24,8 @@ namespace util {
 	
 	void exec(const std::vector<std::string> &argv);
 	void w_execvp(const std::string &file, const std::vector<std::string> &argv);
-	void ok(std::string message);
-	void panic(std::string message);
-	void warning(std::string message);
+	void ok();
+	void panic();
+	void warning();
 	void debug_shell();
 }

@@ -26,24 +26,25 @@ void w_execvp(const std::string &file, const std::vector<std::string> &argv) {
 
 }
 
-void ok(std::string message) {
-	std::cout << "[\033[0;32mOK\033[0m] " << message << std::endl;
+void ok() {
+	std::cout << "\033[6C" << "[\033[0;32mOK\033[0m] " << std::endl;
 }
 
-void panic(std::string message) {
-	std::cout << "[\033[0;31mPANIC\033[0m] " << message << std::endl;
+void panic() {
+	std::cout << "\033[6C" <<"[\033[0;31mPANIC\033[0m] " << std::endl;
 	debug_shell();
         state::change_state(state::sys_halt);
 }
 
-void warning(std::string message) {
-	std::cout << "[\033[0;33m!!!\033[0m] " << message << std::endl;
+void warning() {
+	std::cout << "\033[6C" <<"[\033[0;33m!!!\033[0m] " << std::endl;
 }
 
 void debug_shell() {
-	warning("Init started debug mode!");
-	printf("Executing debug shell.\nTo continue with the init process, exit the shell.\n"
-	       "If this comes after a PANIC, after closing the shell the init will send a SIGUSR1 (reboot)!\n");
+        std::cout << " * Starting debug mode..." << std::endl;
+	warning();
+        std::cout << "Executing debug shell.\nTo continue with the init process, exit the shell.\n"
+	       <<"If this comes after a PANIC, after closing the shell the init will send a SIGUSR1 (reboot)!\n";
 
 	pid_t shell_pid = fork();
 
@@ -55,7 +56,6 @@ void debug_shell() {
 		exit(1);
 	} else {
 		waitpid(shell_pid, 0, 0);
-		ok("Exited debug shell");
                 state::change_state(state::sys_runlevel_2);
 	}
 }
