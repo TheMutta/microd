@@ -1,9 +1,9 @@
 #include "log.h"
 
 inline void setup_log() {
-	printf("Setting up a log in /var/log/init.log...");
+        std::cout << " * Setting up a log in /var/log/init.log..." << std::endl;
 	// Do stuff...
-	util::ok("Done setting up a log.");
+	util::ok();
 
 }
 
@@ -12,7 +12,7 @@ void print_to_log(std::string message) {
 }
 
 inline void close_log() {
-	printf("Shutting down the log...");
+        std:: cout << " * Shutting down the log..." << std::endl;
 	// Do stuff...
-	util::ok ("Log closed.");
+	util::ok ();
 }

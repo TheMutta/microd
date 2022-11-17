@@ -41,12 +41,13 @@ void sig_handler(int sig, siginfo_t *info, void *ucontext);
 void parse_arguments(int argc, char** argv);
 
 int main(int argc, char** argv) {
-
+        // Checking if we're not in PID 1
 	if (getpid() != 1) {
 		std::cout << "Not running as PID 1." << std::endl;
-		exit(0);
+		exit(1);
 	}
 
+        // Setting up signal handling
         struct sigaction new_action;
         new_action.sa_sigaction = sig_handler;
         sigemptyset(&new_action.sa_mask);
@@ -58,14 +59,18 @@ int main(int argc, char** argv) {
         sigaction(SIGCHLD, &new_action, NULL);
         sigaction(SIGCONT, &new_action, NULL);
 
+        // Temporary setting of init_arguments until a proper parsing system is put in place
 	init_arguments.is_debug = false;
 	init_arguments.is_in_root = false;
 	init_arguments.rootdrv = "";
 	init_arguments.rootfstype = "";
 	boot_runlevel = state::FULL;
 
+        // Parsing arguments (TODO: to be overhauled)
 	parse_arguments(argc, argv);
-		
+	
+        // Initrd phase:
+        //  This phase is executed when init is started in an initramfs
 	if (!init_arguments.is_in_root) {
 		std::cout << "Hello, world!" << std::endl
 			  << "Microd version " << version << ", Copyright (C) " << date << " " << author << std::endl
@@ -77,13 +82,18 @@ int main(int argc, char** argv) {
 		initrd_init(init_arguments);
 	}
 
-	util::ok("Started root /init");
+        std::cout << " * Starting root init..." << std::endl;
+	util::ok();
 
-        mounting::mount_specialfs();
+        std::cout << " * Mounting drives..." << std::endl;
 
-	mounting::remount_root_rw(MS_REMOUNT | MS_NOATIME);
+ //       mounting::mount_specialfs();
 
-	util::ok("Finished mounting");
+        mounting::mount_drive("none", "/dev", "devtmpfs", MS_NOSUID);
+
+        mounting::mount_fstab();
+
+//	mounting::remount_root_rw(MS_REMOUNT | MS_NOATIME);
 
 	std::cout << "Hello, world!" << std::endl
 	          << "Microd version " << version << ", Copyright (C) " << date << " " << author << std::endl
@@ -118,7 +128,8 @@ int main(int argc, char** argv) {
 
 	post_init(init_arguments.is_debug);
 
-	util::panic("Something is wrong. We have passed the post_init() function.");
+        std::cout << " * Something is wrong. We have passed the post_init() function." << std::endl;
+	util::panic();
 
 	state::change_state(state::sys_halt);
 }
