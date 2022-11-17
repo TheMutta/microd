@@ -67,8 +67,7 @@ void run_socket() {
         std::cout << "Initctl sends a message...";
 
         if (strcmp(buffer, "runlevel") == 0) {
-                std::cout << "Initctl says hello to the world!" << std::endl;
-                state::change_state(state::sys_runlevel_1);
+                std::cout << "Current runlevel: " << state::curr_runlevel << std::endl;
         } else
                 std::cout << "Initctl said something unknown!" << std::endl;
 

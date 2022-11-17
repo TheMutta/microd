@@ -15,7 +15,8 @@ void change_runlevel(runlevel level) {
 		case OFF:
                         sync();
                         mounting::remount_root_ro();
-                        mounting::unmount_specialfs();
+//                        mounting::unmount_specialfs();
+                        mounting::unmount_fstab();
 			break;
 		case SINGLE:
                         std::cout << "Entering mainenance mode." << std::endl;
@@ -36,7 +37,8 @@ void change_runlevel(runlevel level) {
 		case REBOOT:
                         sync();
                         mounting::remount_root_ro();
-                        mounting::unmount_specialfs();
+//                        mounting::unmount_specialfs();
+                        mounting::unmount_fstab();
 			break;
 
 	}
