@@ -174,6 +174,7 @@ void sig_handler(int sig, siginfo_t *info, void *ucontext) {
                 case SIGCHLD:
                         for(int i = 0; i < unit::managed_units.size(); i++)  {
                                 if(unit::managed_units[i].pid == info->si_pid) {
+                                        std::cout << " -> Unit exited: " << unit::managed_units[i].file /*<< " " << unit::managed_units[i].pid << " by " << info->si_uid << " with signal code " << info->si_code << " with exit code " << info->si_errno*/ << std::endl;
                                         if(state::curr_runlevel != state::OFF &&
                                            state::curr_runlevel != state::REBOOT &&
                                            info->si_errno == 0) {

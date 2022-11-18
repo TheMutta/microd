@@ -3,8 +3,6 @@
 namespace root {
 
 void launch_programs(state::runlevel level) {
-	std::cout << "Launching programs..." << std::endl;
-
 	unit::init();
 
         std::ifstream inittab_file;
@@ -23,7 +21,7 @@ void launch_programs(state::runlevel level) {
                         } else {
                                 file_name = instruction;
                                 file_name = "/etc/init/" + file_name + ".unit";
-				std::cout << "Runnning " << file_name << " as an unit." << std::endl;
+				std::cout << " -> Runnning " << file_name << std::endl;
                                 unit::run_unit(file_name, level, launch_runlevel);
                         }
                         

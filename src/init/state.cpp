@@ -10,7 +10,7 @@ volatile runlevel curr_runlevel;
 void change_runlevel(runlevel level) {
 	curr_runlevel = level;
         unit::kill_units(curr_runlevel);
-	std::cout << "Switched to runlevel " << curr_runlevel << std::endl;
+	std::cout << " * Switched to runlevel " << curr_runlevel << std::endl;
 	switch(curr_runlevel) {
 		case OFF:
                         sync();
@@ -19,7 +19,7 @@ void change_runlevel(runlevel level) {
                         mounting::unmount_fstab();
 			break;
 		case SINGLE:
-                        std::cout << "Entering mainenance mode." << std::endl;
+                        std::cout << " * Entering mainenance mode." << std::endl;
                         //TODO
 			break;
 		case MULTI:
