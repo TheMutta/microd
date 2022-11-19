@@ -26,7 +26,11 @@ void unmount_fstab() {
         FILE *fstab = setmntent("/etc/fstab", "r");
         struct mntent *mount_fs;
         while ((mount_fs = getmntent(fstab))) {
-                unmount_drive(mount_fs->mnt_dir);
+                if(strcmp(mount_fs->mnt_type, "devtmpfs") != 0 &&
+                     strcmp(mount_fs->mnt_type, "devpts") != 0 &&
+                     strcmp(mount_fs->mnt_type, "sysfs") != 0 &&
+                     strcmp(mount_fs->mnt_type, "proc") != 0)
+                        unmount_drive(mount_fs->mnt_dir);
         }
 
         endmntent(fstab);
