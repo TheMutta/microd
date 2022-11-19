@@ -3,10 +3,16 @@
 namespace mounting {
 
 void mount_fstab() {
+        std::cout << " * Loading fstab..." << std::endl;
+        if(!std::filesystem::exists("/etc/fstab")) {
+                util::warning();
+                std::cout << " -> Fstab does not exist, loading default filesystems..." << std::endl;
+                mount_specialfs();
+        }
         FILE *fstab = setmntent("/etc/fstab", "r");
         struct mntent *mount_fs;
         while ((mount_fs = getmntent(fstab))) {
-	        std::cout << " * Mounting " << mount_fs->mnt_fsname << " " << mount_fs->mnt_type << " in " << mount_fs->mnt_dir << "..." << std::endl;
+	        std::cout << " -> Mounting " << mount_fs->mnt_fsname << " " << mount_fs->mnt_type << " in " << mount_fs->mnt_dir << "..." << std::endl;
                 std::string command;
                 command = "mount ";
                 command = command.append(mount_fs->mnt_dir);
@@ -20,7 +26,11 @@ void unmount_fstab() {
         FILE *fstab = setmntent("/etc/fstab", "r");
         struct mntent *mount_fs;
         while ((mount_fs = getmntent(fstab))) {
-                unmount_drive(mount_fs->mnt_dir);
+                if(strcmp(mount_fs->mnt_type, "devtmpfs") != 0 &&
+                     strcmp(mount_fs->mnt_type, "devpts") != 0 &&
+                     strcmp(mount_fs->mnt_type, "sysfs") != 0 &&
+                     strcmp(mount_fs->mnt_type, "proc") != 0)
+                        unmount_drive(mount_fs->mnt_dir);
         }
 
         endmntent(fstab);

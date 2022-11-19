@@ -87,13 +87,9 @@ int main(int argc, char** argv) {
 
         std::cout << " * Mounting drives..." << std::endl;
 
- //       mounting::mount_specialfs();
-
-        mounting::mount_drive("none", "/dev", "devtmpfs", MS_NOSUID);
+        mounting::mount_drive("devtmpfs", "/dev", "devtmpfs", MS_NOSUID);
 
         mounting::mount_fstab();
-
-//	mounting::remount_root_rw(MS_REMOUNT | MS_NOATIME);
 
 	std::cout << "Hello, world!" << std::endl
 	          << "Microd version " << version << ", Copyright (C) " << date << " " << author << std::endl
