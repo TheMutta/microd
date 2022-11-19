@@ -87,19 +87,22 @@ int run_unit(std::string unit_file, state::runlevel level, state::runlevel launc
 			exit(1);
 		}
 
-		managed_units.push_back(Unit());
-		managed_units[managed_units.size() - 1].file = unit_file;
-		managed_units[managed_units.size() - 1].pid = daemon;
-		managed_units[managed_units.size() - 1].runlevel = launch_runlevel;
+                Unit new_unit;
+                new_unit.file = unit_file;
+                new_unit.pid = daemon;
+                new_unit.runlevel = launch_runlevel;
 
 		if (restart == "always") {
-			managed_units[managed_units.size() - 1].restart = true;
-			managed_units[managed_units.size() - 1].restart_unless_stopped = true;
+			new_unit.restart = true;
+			new_unit.restart_unless_stopped = true;
 		} else if (restart == "nostop") {
-			managed_units[managed_units.size() - 1].restart = true;
+			new_unit.restart = true;
 		} else {
 			// Is either never or not valid
 		}
+
+
+		managed_units.push_back(new_unit);
 
 		return 0;
 	} else {
