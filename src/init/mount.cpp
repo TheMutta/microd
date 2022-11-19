@@ -6,7 +6,12 @@ void mount_fstab() {
         FILE *fstab = setmntent("/etc/fstab", "r");
         struct mntent *mount_fs;
         while ((mount_fs = getmntent(fstab))) {
-                mount_drive(mount_fs->mnt_fsname, mount_fs->mnt_dir, mount_fs->mnt_type, /*mount_fs->mnt_opts*/ 0);
+	        std::cout << " * Mounting " << mount_fs->mnt_fsname << " " << mount_fs->mnt_type << " in " << mount_fs->mnt_dir << "..." << std::endl;
+                std::string command;
+                command = "mount ";
+                command = command.append(mount_fs->mnt_dir);
+                system(command.c_str());
+                //mount_drive(mount_fs->mnt_fsname, mount_fs->mnt_dir, mount_fs->mnt_type, /*mount_fs->mnt_opts*/ 0);
         }
 
         endmntent(fstab);
