@@ -11,7 +11,6 @@ void mount_fstab() {
                 command = "mount ";
                 command = command.append(mount_fs->mnt_dir);
                 system(command.c_str());
-                //mount_drive(mount_fs->mnt_fsname, mount_fs->mnt_dir, mount_fs->mnt_type, /*mount_fs->mnt_opts*/ 0);
         }
 
         endmntent(fstab);
