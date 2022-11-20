@@ -32,14 +32,20 @@
 #include "unit.h"
 #include "../config.h"
 
+// Parsed arguments
 util::arguments init_arguments;
 
+// Our boot runlevel
 state::runlevel boot_runlevel;
 
 void sig_handler(int sig, siginfo_t *info, void *ucontext);
 
 void parse_arguments(int argc, char** argv);
 
+/*
+ * main:
+ *  The main flow of the program
+ */
 int main(int argc, char** argv) {
         // Checking if we're not in PID 1
 	if (getpid() != 1) {
@@ -98,6 +104,7 @@ int main(int argc, char** argv) {
 		  << "under certain conditions. Please consult the LICENSE file," << std::endl
 	          << "located in the program's repository, for more information." << std::endl;
 
+        // Going to the user selecter runlevel
 	switch(boot_runlevel) {
 		case state::OFF:
 			state::change_state(state::sys_halt);
@@ -122,13 +129,22 @@ int main(int argc, char** argv) {
 			break;
 	}
 
+        // Once we're done, we go to sleep
 	post_init(init_arguments.is_debug);
 
+        // Something is really wrong
         std::cout << " * Something is wrong. We have passed the post_init() function." << std::endl;
 	util::panic();
 
+        // We quit for precaution
 	state::change_state(state::sys_halt);
 }
+
+/*
+ * parse_arguments:
+ *  This function is used to parse the command line arguments that the kernel
+ *  has given us.
+ */
 
 inline void parse_arguments(int argc, char** argv) {
 	for (int i=0; i<argc; i++) {
@@ -153,21 +169,25 @@ inline void parse_arguments(int argc, char** argv) {
 	}
 }
 
+/*
+ * sig_handler:
+ *  This function is called automatically by the system when a signal is recieved
+ */
 void sig_handler(int sig, siginfo_t *info, void *ucontext) {
 	switch(sig) {
-		case SIGTERM:
+		case SIGTERM: // Conformance
 			state::change_state(state::sys_reboot);
 			break;
-		case SIGUSR1:
+		case SIGUSR1: // Conformance
 			state::change_state(state::sys_halt);
 			break;
-		case SIGUSR2:
+		case SIGUSR2: // Conformance
 			state::change_state(state::sys_poweroff);
 			break;
-                case SIGCONT:
+                case SIGCONT: // Signal send by initctl
                         server::run_socket();
                         break;
-                case SIGCHLD:
+                case SIGCHLD: // What happens if a child dies?
                         for(int i = 0; i < unit::managed_units.size(); i++)  {
                                 if(unit::managed_units[i].pid == info->si_pid) {
                                         std::cout << " -> Unit exited: " << unit::managed_units[i].file /*<< " " << unit::managed_units[i].pid << " by " << info->si_uid << " with signal code " << info->si_code << " with exit code " << info->si_errno*/ << std::endl;
@@ -190,8 +210,7 @@ void sig_handler(int sig, siginfo_t *info, void *ucontext) {
                                 }
                         }
                         break;
-		default:
-			// Signal not recognized
+		default: // Signal not recognized
 			std::cout << "Recieved unrecognized signal: " << sig << std::endl;
 			break;
         }

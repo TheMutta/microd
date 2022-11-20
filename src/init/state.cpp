@@ -5,8 +5,15 @@
 
 namespace state {
 
-volatile runlevel curr_runlevel;
+// The curren runlevel we're in 
+runlevel curr_runlevel;
 
+/*
+ * change_runlevel:
+ *  This function is used to change runlevel to the specified runlevel. It will kill all
+ *  the units that have gone out of scope and it will eventually, in case of an OFF or REBOOT,
+ *  unmount mounted drives
+ */
 void change_runlevel(runlevel level) {
 	curr_runlevel = level;
         unit::kill_units(curr_runlevel);
@@ -42,6 +49,11 @@ void change_runlevel(runlevel level) {
 	}
 }
 
+/*
+ * change_runlevel:
+ *  This function is used to change the current state of init. It is the main component
+ *  of the state machine.
+ */
 void change_state(change_action action) {
 	sync();
 	

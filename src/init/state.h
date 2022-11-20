@@ -2,6 +2,7 @@
 #include <unistd.h>
 
 namespace state {
+        // All possible runlevels
         enum runlevel {
 		OFF,
 		SINGLE,
@@ -12,6 +13,7 @@ namespace state {
 		REBOOT
 	};
 
+        // All possible change_state actions
 	enum change_action { sys_reboot,
 			     sys_poweroff,
 			     sys_halt,
@@ -24,7 +26,7 @@ namespace state {
 			     sys_runlevel_5,
 	};
 
-	extern volatile runlevel curr_runlevel;
+	extern runlevel curr_runlevel;
 
         void change_runlevel(runlevel level);
 	void change_state(change_action action);
