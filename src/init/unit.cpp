@@ -80,10 +80,12 @@ int run_unit(std::string unit_file, state::runlevel level, state::runlevel launc
 			executable.push_back(value);
 		}
 
+                bool already_exists = false;
+
 		for (int i = 0; i < managed_units.size(); i++) {
 			if (unit_file == managed_units[i].file) {
-				// Unit already exists, not restarting
-				return 1;
+				// Unit already exists, restarting it
+                                already_exists = true;
 			}
 		}
 
@@ -93,22 +95,33 @@ int run_unit(std::string unit_file, state::runlevel level, state::runlevel launc
 			exit(1);
 		}
 
-                Unit new_unit;
-                new_unit.file = unit_file;
-                new_unit.pid = daemon;
-                new_unit.runlevel = launch_runlevel;
+                if (!already_exists) {
+                        Unit new_unit;
+                        new_unit.file = unit_file;
+                        new_unit.active = true;
+                        new_unit.pid = daemon;
+                        new_unit.runlevel = launch_runlevel;
 
-		if (restart == "always") {
-			new_unit.restart = true;
-			new_unit.restart_unless_stopped = true;
-		} else if (restart == "nostop") {
-			new_unit.restart = true;
-		} else {
-			// Is either never or not valid
+		        if (restart == "always") {
+        			new_unit.restart = true;
+	        	} else if (restart == "nostop") {
+		        	new_unit.restart = false;
+			        new_unit.restart_unless_stopped = true;
+        		} else {
+                                new_unit.restart = false;
+		        	new_unit.restart_unless_stopped = false;
+        		}
+
+	        	managed_units.push_back(new_unit);
+                } else {
+                	for (int i = 0; i < managed_units.size(); i++) {
+		        	if (unit_file == managed_units[i].file) {
+                                        managed_units[i].active = true;
+                                        managed_units[i].pid = daemon;
+                                }
+			}
 		}
 
-
-		managed_units.push_back(new_unit);
 
 		return 0;
 	} else {
@@ -118,14 +131,16 @@ int run_unit(std::string unit_file, state::runlevel level, state::runlevel launc
 
 void kill_units(state::runlevel level) {
 	for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-		if(level == state::OFF || level == state::REBOOT || unit::managed_units[i].runlevel < level) {
+		if((level == state::OFF || level == state::REBOOT || unit::managed_units[i].runlevel > level)
+                    && unit::managed_units[i].active == true) {
 			std::cout << " -> Sending SIGTERM to " << unit::managed_units[i].file << std::endl;
 			kill(unit::managed_units[i].pid, SIGTERM);
 		}
 	}
 
 	for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-		if(level == state::OFF || level == state::REBOOT || unit::managed_units[i].runlevel < level) {
+		if((level == state::OFF || level == state::REBOOT || unit::managed_units[i].runlevel < level)
+                    && unit::managed_units[i].active == true) {
 			std::cout << " -> Sending SIGKILL to " << unit::managed_units[i].file << std::endl;
 			kill(unit::managed_units[i].pid, SIGKILL);
 		}
