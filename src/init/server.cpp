@@ -1,11 +1,12 @@
 #include "server.h"
 
 #include "state.h"
+#include "unit.h"
 
 namespace server {
 
-const char* socket_name = "/var/run/init.socket\0";
-const unsigned short socket_buffer_size = 1024;
+const char* socket_name = "/var/run/init.socket";
+const unsigned short socket_buffer_size = 4096;
 struct sockaddr_un name;
 int server_socket = socket(AF_UNIX, SOCK_STREAM, 0);
 int data_socket;
@@ -64,19 +65,42 @@ void run_socket() {
              	perror("read");
         }
         
-        std::cout << "Initctl sends a message...";
-
-        if (strcmp(buffer, "runlevel") == 0) {
+        if(strcmp(buffer, "RLVL_CHNG1") == 0) {
+                std::cout << " ## Changing runlevel to 1!" << std::endl;
+                state::change_state(state::sys_runlevel_1);
+        } else if(strcmp(buffer, "RLVL_CHNG2") == 0) {
+                std::cout << " ## Changing runlevel to 2!" << std::endl;
+                state::change_state(state::sys_runlevel_2);
+        } else if(strcmp(buffer, "RLVL_CHNG3") == 0) {
+                std::cout << " ## Changing runlevel to 3!" << std::endl;
+                state::change_state(state::sys_runlevel_3);
+        } else if(strcmp(buffer, "RLVL_CHNG4") == 0) {
+                std::cout << " ## Changing runlevel to 4!" << std::endl;
+                state::change_state(state::sys_runlevel_4);
+        } else if(strcmp(buffer, "RLVL_CHNG5") == 0) {
+                std::cout << " ## Changing runlevel to 5!" << std::endl;
+                state::change_state(state::sys_runlevel_5);
+        } else if(strcmp(buffer, "UNIT_LST") == 0) {
+                std::cout << " ## Listing units!" << std::endl;
+                if (unit::managed_units.size() >= 1) {
+                        strcpy(buffer, std::to_string(unit::managed_units[0].pid).c_str());
+                        strcat(buffer, "\n");
+                
+                        for (int i = 1; i < unit::managed_units.size(); i++) {
+                                strcat(buffer, std::to_string(unit::managed_units[i].pid).c_str());
+                                strcat(buffer, "\n");
+                        }
+                }
+        } else if(strcmp(buffer, "RLVL_LST") == 0) {
                 std::cout << "Current runlevel: " << state::curr_runlevel << std::endl;
-        } else
-                std::cout << "Initctl said something unknown!" << std::endl;
+        }
 
         /* Send buffer. */
-
         ret = write(data_socket, buffer, sizeof(buffer));
         if (ret == -1) {
                 perror("write");
         }
+
 }
 
 void close_socket() {

@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <string>
 
 namespace server {
         extern const char* socket_name;
