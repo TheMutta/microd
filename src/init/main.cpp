@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
         //  This phase is executed when init is started in an initramfs
 	if (!init_arguments.is_in_root) {
 		std::cout << "Hello, world!" << std::endl
-			  << "Microd version " << version << ", Copyright (C) " << date << " " << author << std::endl
+			  << "Microd version " << VERSION << ", Copyright (C) " << DATE << " " << AUTHOR << std::endl
 		          << "Microd comes with ABSOLUTELY NO WARRANTY." << std::endl
 		          << "This is free software, and you are welcome to redistribute it." << std::endl
 			  << "under certain conditions. Please consult the LICENSE file," << std::endl
@@ -98,7 +98,7 @@ int main(int argc, char** argv) {
         mounting::mount_fstab();
 
 	std::cout << "Hello, world!" << std::endl
-	          << "Microd version " << version << ", Copyright (C) " << date << " " << author << std::endl
+	          << "Microd version " << VERSION << ", Copyright (C) " << DATE << " " << AUTHOR << std::endl
 	          << "Microd comes with ABSOLUTELY NO WARRANTY." << std::endl
 	          << "This is free software, and you are welcome to redistribute it." << std::endl
 		  << "under certain conditions. Please consult the LICENSE file," << std::endl
@@ -190,10 +190,11 @@ void sig_handler(int sig, siginfo_t *info, void *ucontext) {
                 case SIGCHLD: // What happens if a child dies?
                         for(int i = 0; i < unit::managed_units.size(); i++)  {
                                 if(unit::managed_units[i].pid == info->si_pid) {
-                                        std::cout << " -> Unit exited: " << unit::managed_units[i].file /*<< " " << unit::managed_units[i].pid << " by " << info->si_uid << " with signal code " << info->si_code << " with exit code " << info->si_errno*/ << std::endl;
+                                        std::cout << " -> Unit exited: " << unit::managed_units[i].file << " " << unit::managed_units[i].pid << " by " << info->si_uid << " with signal code " << info->si_code << " with exit code " << info->si_errno << std::endl;
                                         if(state::curr_runlevel != state::OFF &&
                                            state::curr_runlevel != state::REBOOT &&
-                                           info->si_errno == 0) {
+                                           info->si_errno == 0 &&
+                                           info->si_code == 1) {
                                                 std::string unit_name;
                                                 unit_name = unit::managed_units[i].file;
         	        			unit::managed_units.erase(unit::managed_units.begin() + i);
@@ -203,6 +204,9 @@ void sig_handler(int sig, siginfo_t *info, void *ucontext) {
                                                      !unit::managed_units[i].is_stopped)) {
         					         unit::run_unit(unit_name, state::curr_runlevel, unit::managed_units[i].runlevel);
                                                 }
+                                        } else if (info->si_code == SIGKILL || info->si_code == SIGTERM) {
+                                                std::cout << "Unit " << info->si_pid << " was killed." << std::endl;
+                                                unit::managed_units.erase(unit::managed_units.begin() + i);
                                         } else {
                                                 std::cout << "Unit " << info->si_pid << " failed." << std::endl;
                                                 unit::managed_units.erase(unit::managed_units.begin() + i);
