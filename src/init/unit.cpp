@@ -2,9 +2,12 @@
 
 namespace unit {
 
-
+// Vector that contains all the units currently being managed by init
 std::vector<Unit> managed_units;
 
+// This are the valid actions that an unit file can contain
+// the map<std::string, enum> is used so to remove the need of
+// an if/else if/else statement chain and to allow for easy expandability
 enum valid_actions {
 		     action_executable,
 		     action_message,
@@ -14,7 +17,10 @@ enum valid_actions {
 
 std::map<std::string, valid_actions> mapped_actions;
 
-
+/*
+ * init:
+ *  This function maps the right values to the correct actions
+ */
 void init() {
 	mapped_actions["exec"] = action_executable;
 	mapped_actions["mesg"] = action_message;
