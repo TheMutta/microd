@@ -20,6 +20,13 @@ void change_runlevel(runlevel level) {
 	std::cout << " * Switched to runlevel " << curr_runlevel << std::endl;
 	switch(curr_runlevel) {
 		case OFF:
+                case REBOOT:
+                        std::cout << " * Sending SIGTERM to all processes..." << std::endl;
+                        kill(-1, SIGTERM);
+                        util::ok();
+                        std::cout << " * Sending SIGKILL to all processes..." << std::endl;
+                        kill(-1, SIGKILL);
+                        util::ok();
                         sync();
                         mounting::remount_root_ro();
                         mounting::unmount_fstab();
@@ -40,17 +47,12 @@ void change_runlevel(runlevel level) {
 		case FULL:
 			root::launch_programs(curr_runlevel);
 			break;
-		case REBOOT:
-                        sync();
-                        mounting::remount_root_ro();
-                        mounting::unmount_fstab();
-			break;
-
+		
 	}
 }
 
 /*
- * change_runlevel:
+ * change_state:
  *  This function is used to change the current state of init. It is the main component
  *  of the state machine.
  */
@@ -96,7 +98,5 @@ void change_state(change_action action) {
 			break;
 	}
 }
-
-
 
 }
