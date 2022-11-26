@@ -11,10 +11,10 @@
 #include "../config.h"
 
 char* socket_name = "/var/run/init.socket";
-unsigned short socket_buffer_size = 1024;
+unsigned short socket_buffer_size = 4096;
 
 int main(int argc, char** argv) {
-        std::cout << "Hello world from initctl " << version << std::endl;
+        std::cout << "Hello world from initctl " << VERSION << std::endl;
         struct sockaddr_un addr;
         int ret;
         int data_socket;
@@ -50,35 +50,45 @@ int main(int argc, char** argv) {
         /* Send arguments. */
         
         if (argc > 1) {
-                strcpy(buffer, argv[1]);
-                buffer[sizeof(buffer) - 1] = 0;
+                if(strcmp(argv[1], "set-runlevel") == 0) {
+                        char *tmp =  new char[256];
+                        strcpy(tmp, "RLVL_CHNG");
+                        strcat(tmp, argv[2]);
+                        strcpy(buffer, tmp);
+                        delete[] tmp;
+                } else if(strcmp(argv[1], "list-units") == 0) {
+                        strcpy(buffer, "UNIT_LST");
+                } else if(strcmp(argv[1], "get-runlevel") == 0) {
+                        strcpy(buffer, "RLVL_LST");
+                }
+                buffer[sizeof(buffer) - 1] = '\0';
                 ret = write(data_socket, buffer, strlen(buffer) + 1);
                 if (ret == -1) {
                         perror("write");
                         exit(EXIT_FAILURE);
                 }
+
+                kill(1, SIGCONT);
+
+                /* Receive result. */
+
+                ret = read(data_socket, buffer, sizeof(buffer));
+                if (ret == -1) {
+                        perror("read");
+                        exit(EXIT_FAILURE);
+                }
+
+                /* Ensure buffer is 0-terminated. */
+
+                buffer[sizeof(buffer) - 1] = 0;
+
+                std::cout << buffer << std::endl;
+
+                /* Close socket. */
+
+                close(data_socket);
+
+                exit(EXIT_SUCCESS);
         }
-
-        kill(1, SIGCONT);
-
-        /* Receive result. */
-
-        ret = read(data_socket, buffer, sizeof(buffer));
-        if (ret == -1) {
-                perror("read");
-                exit(EXIT_FAILURE);
-        }
-
-        /* Ensure buffer is 0-terminated. */
-
-        buffer[sizeof(buffer) - 1] = 0;
-
-        std::cout << buffer << std::endl;
-
-        /* Close socket. */
-
-        close(data_socket);
-
-        exit(EXIT_SUCCESS);
         return 0;
 }
