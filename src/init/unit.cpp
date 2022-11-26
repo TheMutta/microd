@@ -9,11 +9,11 @@ std::vector<Unit> managed_units;
 // the map<std::string, enum> is used so to remove the need of
 // an if/else if/else statement chain and to allow for easy expandability
 enum valid_actions {
-		     action_executable,
-		     action_message,
-		     action_requires,
-		     action_restart
-		   };
+        action_executable,
+	action_message,
+	action_requires,
+	action_restart
+};
 
 std::map<std::string, valid_actions> mapped_actions;
 
