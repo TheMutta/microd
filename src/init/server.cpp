@@ -64,7 +64,10 @@ void run_socket() {
         if (ret == -1) {
              	perror("read");
         }
-        
+       
+        std::string message = buffer;
+        size_t pos;
+
         if(strcmp(buffer, "RLVL_CHNG1") == 0) {
                 std::cout << " ## Changing runlevel to 1!" << std::endl;
                 state::change_state(state::sys_runlevel_1);
@@ -83,16 +86,23 @@ void run_socket() {
         } else if(strcmp(buffer, "UNIT_LST") == 0) {
                 std::cout << " ## Listing units!" << std::endl;
                 if (unit::managed_units.size() >= 1) {
-                        strcpy(buffer, std::to_string(unit::managed_units[0].pid).c_str());
+                        strcpy(buffer, unit::managed_units[0].file.c_str());
+                        strcat(buffer, "\t");
+                        strcat(buffer, std::to_string(unit::managed_units[0].pid).c_str());
                         strcat(buffer, "\n");
                 
                         for (int i = 1; i < unit::managed_units.size(); i++) {
+                                strcat(buffer, unit::managed_units[i].file.c_str());
+                                strcat(buffer, "\t");
                                 strcat(buffer, std::to_string(unit::managed_units[i].pid).c_str());
                                 strcat(buffer, "\n");
                         }
                 }
+        } else if ("UNIT_STR") { // unit start
+        } else if ("UNIT_STP") { // unit stop
+        } else if ("UNIT_RST") { // unit restart (stop and start)
         } else if(strcmp(buffer, "RLVL_LST") == 0) {
-                std::cout << "Current runlevel: " << state::curr_runlevel << std::endl;
+                std::cout << " ## Current runlevel: " << state::curr_runlevel << std::endl;
         }
 
         /* Send buffer. */
