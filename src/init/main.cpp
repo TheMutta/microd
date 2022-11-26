@@ -197,7 +197,10 @@ void sig_handler(int sig, siginfo_t *info, void *ucontext) {
                                            info->si_code == 1) {
                                                 std::string unit_name;
                                                 unit_name = unit::managed_units[i].file;
-        	        			unit::managed_units.erase(unit::managed_units.begin() + i);
+                                                unit::managed_units[i].active = false;
+                                                unit::managed_units[i].pid = -1;
+
+        	        			//unit::managed_units.erase(unit::managed_units.begin() + i);
 
                                                 if (unit::managed_units[i].restart ||
                                                     (unit::managed_units[i].restart_unless_stopped &&
@@ -206,10 +209,16 @@ void sig_handler(int sig, siginfo_t *info, void *ucontext) {
                                                 }
                                         } else if (info->si_code == SIGKILL || info->si_code == SIGTERM) {
                                                 std::cout << "Unit " << info->si_pid << " was killed." << std::endl;
-                                                unit::managed_units.erase(unit::managed_units.begin() + i);
+                                                unit::managed_units[i].active = false;
+                                                unit::managed_units[i].pid = -1;
+
+                                                //unit::managed_units.erase(unit::managed_units.begin() + i);
                                         } else {
                                                 std::cout << "Unit " << info->si_pid << " failed." << std::endl;
-                                                unit::managed_units.erase(unit::managed_units.begin() + i);
+                                                unit::managed_units[i].active = false;
+                                                unit::managed_units[i].pid = -1;
+
+                                                //unit::managed_units.erase(unit::managed_units.begin() + i);
                                         }
                                 }
                         }
