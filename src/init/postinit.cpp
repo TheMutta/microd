@@ -16,7 +16,7 @@ void post_init(bool debug) {
 
         server::init_socket();
 
-        while (true) { sleep(1000); }
+        while (true);
         
         server::close_socket();
 }
