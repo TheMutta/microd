@@ -13,6 +13,7 @@ void exec(const std::vector<std::string> &argv) {
 
 void w_execvp(const std::string &file, const std::vector<std::string> &argv) {
 	std::vector<char *> vec_cp;
+	std::vector<char *> env;
 	vec_cp.reserve(argv.size() + 1);
 
 	for (auto const& s : argv)
@@ -20,9 +21,12 @@ void w_execvp(const std::string &file, const std::vector<std::string> &argv) {
 
 	vec_cp.push_back(nullptr);
 
-	execvp(file.c_str(), vec_cp.data());
+        env.push_back("PATH=PATH:/bin:/sbin");
+        env.push_back(nullptr);
 
-	perror("execvp");
+	execvpe(file.c_str(), vec_cp.data(), env.data());
+
+	perror("execvpe");
 
 }
 
