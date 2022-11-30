@@ -12,11 +12,11 @@ void post_init(bool debug) {
 	std::cout << "Init has entered quiet mode." << std::endl
 		  << "Unless debug mode is active, only critical messages will be sent." << std::endl;
 
-	std::cout << "Currently running units: " << unit::managed_units.size() << std::endl;
+	std::cout << "Currently running units: " << unit::managed_units.size() << std::endl; // TODO: fixit
 
         server::init_socket();
 
-        while (true);
+        while (true) { sleep(1); };
         
         server::close_socket();
 }
