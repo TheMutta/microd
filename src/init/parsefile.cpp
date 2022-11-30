@@ -45,7 +45,6 @@ std::map<std::string,std::string> parse_file(std::string file_path, std::vector<
                         it = find(actions_name.begin(), actions_name.end(), action);
                         if (it != actions_name.end()) {
         			std::getline(curr_line, action);
-                                std::cout << "  >>>>>>>>>>>>>>>>> " << (it - actions_name.begin()) << std::endl;
                                 parsed_file[actions_name[it - actions_name.begin()]] = action;
                         }
 		}
