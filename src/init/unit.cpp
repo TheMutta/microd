@@ -42,6 +42,7 @@ int run_unit(std::string unit_file, state::runlevel level, state::runlevel launc
 	pid_t daemon = fork();
 	if (daemon == 0) {
 		util::exec(executable);
+                std::cout << " --> " << executable[0] << std::endl;
 		exit(1);
 	}
 
