@@ -15,6 +15,9 @@ runlevel curr_runlevel;
  *  unmount mounted drives
  */
 void change_runlevel(runlevel level) {
+        if(curr_runlevel == SINGLE && level != curr_runlevel) {
+                unit::kill_units(OFF);
+        }
 	curr_runlevel = level;
         unit::kill_units(curr_runlevel);
 	std::cout << " * Switched to runlevel " << curr_runlevel << std::endl;
@@ -33,7 +36,7 @@ void change_runlevel(runlevel level) {
 			break;
 		case SINGLE:
                         std::cout << " * Entering mainenance mode." << std::endl;
-                        //TODO
+                        unit::run_unit("/etc/init/debug.unit", SINGLE, SINGLE);
 			break;
 		case MULTI:
 			root::launch_programs(curr_runlevel);
