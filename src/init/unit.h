@@ -36,5 +36,4 @@ namespace unit {
                      state::runlevel level,
                      state::runlevel launch_runlevel);
         void kill_units(state::runlevel level);
-        /*void init();*/
 }
