@@ -93,6 +93,7 @@ int run_unit(std::string unit_file, state::runlevel level, state::runlevel launc
 			// Unit already exists, restarting it
                         already_exists = true;
                         if(managed_units[i].active == true) {
+                                std::cout << " ->> Already active" << std::endl;
                                 return -1;
                         }
 		}
