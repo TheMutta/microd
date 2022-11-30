@@ -82,10 +82,14 @@ int run_unit(std::string unit_file, state::runlevel level, state::runlevel launc
 
                 bool already_exists = false;
 
+
 		for (int i = 0; i < managed_units.size(); i++) {
 			if (unit_file == managed_units[i].file) {
 				// Unit already exists, restarting it
                                 already_exists = true;
+                                if(managed_units[i].active == true) {
+                                        return -1;
+                                }
 			}
 		}
 
@@ -131,16 +135,14 @@ int run_unit(std::string unit_file, state::runlevel level, state::runlevel launc
 
 void kill_units(state::runlevel level) {
 	for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-		if((level == state::OFF || level == state::REBOOT || unit::managed_units[i].runlevel > level)
-                    && unit::managed_units[i].active == true) {
+		if((level == state::OFF || level == state::REBOOT || unit::managed_units[i].runlevel > level ) && unit::managed_units[i].pid != -1) {
 			std::cout << " -> Sending SIGTERM to " << unit::managed_units[i].file << std::endl;
 			kill(unit::managed_units[i].pid, SIGTERM);
 		}
 	}
 
 	for (unsigned long int i = 0; i < unit::managed_units.size(); i++) {
-		if((level == state::OFF || level == state::REBOOT || unit::managed_units[i].runlevel < level)
-                    && unit::managed_units[i].active == true) {
+		if((level == state::OFF || level == state::REBOOT || unit::managed_units[i].runlevel > level ) && unit::managed_units[i].pid != -1) {
 			std::cout << " -> Sending SIGKILL to " << unit::managed_units[i].file << std::endl;
 			kill(unit::managed_units[i].pid, SIGKILL);
 		}
