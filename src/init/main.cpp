@@ -208,13 +208,13 @@ void sig_handler(int sig, siginfo_t *info, void *ucontext) {
         					         unit::run_unit(unit_name, state::curr_runlevel, unit::managed_units[i].runlevel);
                                                 }
                                         } else if (info->si_code == SIGKILL || info->si_code == SIGTERM) {
-                                                std::cout << "Unit " << info->si_pid << " was killed." << std::endl;
+                                                std::cout << " -> Unit " << info->si_pid << " was killed." << std::endl;
                                                 unit::managed_units[i].active = false;
                                                 unit::managed_units[i].pid = -1;
 
                                                 //unit::managed_units.erase(unit::managed_units.begin() + i);
                                         } else {
-                                                std::cout << "Unit " << info->si_pid << " failed." << std::endl;
+                                                std::cout << " -> Unit " << info->si_pid << " failed." << std::endl;
                                                 unit::managed_units[i].active = false;
                                                 unit::managed_units[i].pid = -1;
 
@@ -224,7 +224,7 @@ void sig_handler(int sig, siginfo_t *info, void *ucontext) {
                         }
                         break;
 		default: // Signal not recognized
-			std::cout << "Recieved unrecognized signal: " << sig << std::endl;
+			std::cout << " -> Recieved unrecognized signal: " << sig << std::endl;
 			break;
         }
 }
