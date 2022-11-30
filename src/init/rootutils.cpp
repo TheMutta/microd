@@ -3,8 +3,6 @@
 namespace root {
 
 void launch_programs(state::runlevel level) {
-	unit::init();
-
         std::ifstream inittab_file;
         inittab_file.open("/etc/inittab");
 
