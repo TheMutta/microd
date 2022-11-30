@@ -7,7 +7,6 @@ unit::Unit parse_unit_file(std::string file_path) {
         std::vector<std::string> actions_name;
         actions_name.push_back("exec");
         actions_name.push_back("mesg");
-        actions_name.push_back("before");
         actions_name.push_back("restart");
 
         std::map<std::string,std::string> parsed_file = parse_file(file_path, actions_name);
